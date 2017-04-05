@@ -210,6 +210,19 @@ begin
 		rResultMul   <= TempMul[31:16];
 		rBranchTaken <= 1'b0;
 	end
+	
+	//-------------------------------------
+	// para multiplicador de 4bits
+	`MUL4bits:
+	begin
+		rFFLedEN     <= 1'b1;
+		rWriteEnable <= 1'b1;
+		rMulEnable   <= 1'b1;
+		//TempMul      <= wSourceData1m * wSourceData0m;
+		//rResult      <= TempMul[15:0];
+		rResultMul   <= rResultMul4bits;
+		rBranchTaken <= 1'b0;
+	end
 	//-------------------------------------
 	default:
 	begin
