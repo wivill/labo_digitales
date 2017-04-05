@@ -22,10 +22,21 @@ reg [31:0] 	 TempMul;
 wire [7:0]  wSourceAddr0,wSourceAddr1,wDestination;
 wire  [15:0] wSourceData0,wSourceData1,wIPInitialValue,wImmediateValue;
 
+// prueba de 4 bits
+wire  [3:0] wSourceData0Prueba,wSourceData1Prueba
+
 wire signed [15:0] wSourceData0m,wSourceData1m;
+
+// prueba de 4bits 
+wire signed [3:0] wSourceData0mPrueba,wSourceData1mPrueba;
 
  assign wSourceData0m = wSourceData0;
  assign wSourceData1m = wSourceData1;
+ 
+ // prueba de 4 bits
+ 
+ assign wSourceData0mPrueba = wSourceData0Prueba;
+ assign wSourceData1mPrueba = wSourceData1Prueba;
 
 ROM InstructionRom 
 (
