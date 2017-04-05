@@ -58,17 +58,20 @@ module MULTIPLICADOR3 # (parameter SIZE=16)
 	output reg [SIZE:0] Res
 );
 	assign Ci[0] = 1'b0;
-	assign Res[0] = iA[0]&iB[0];
 	assign Co = Ci[SIZE];
 	
 	genvar i;
 	generate
-		for (i=0; i<SIZE, i=i+1)
+		for (i=1; i<SIZE-1, i=i+1)
 		begin: mult_cell
-			assign {Ci[i+1],Res[i]} = 
-	
+			assign Res[0] = iA[0]&iB[0];
+			assign {Ci[i+1],Res[i]} = iA[i]&iB[0] + iA[i-1]&iB[1] + Ci[i];
+			assign {Ci[SIZE],Res[SIZE-1]} = iA[SIZE-1]&iB[1] + Ci[SIZE-1];
+		end
 	endgenerate
-
+	
+	
+	
 endmodule
 
 //----------------------------------------------------------------------
