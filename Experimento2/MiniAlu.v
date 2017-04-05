@@ -1,6 +1,7 @@
 
 `timescale 1ns / 1ps
 `include "Defintions.v"
+`include "labdigitales.v"
 
 
 module MiniAlu
@@ -22,7 +23,7 @@ reg [31:0] 	 TempMul;
 wire [7:0]  wSourceAddr0,wSourceAddr1,wDestination;
 wire  [15:0] wSourceData0,wSourceData1,wIPInitialValue,wImmediateValue;
 
-// prueba de 4 bits
+// prueba de 4 bits // el que dice prueba es para el de 4 bits 
 wire  [3:0] wSourceData0Prueba,wSourceData1Prueba
 
 wire signed [15:0] wSourceData0m,wSourceData1m;
@@ -37,6 +38,11 @@ wire signed [3:0] wSourceData0mPrueba,wSourceData1mPrueba;
  
  assign wSourceData0mPrueba = wSourceData0Prueba;
  assign wSourceData1mPrueba = wSourceData1Prueba;
+ 
+ // prueba de 4 bits, para resultado 
+ reg [7:0] 	 rResultMul4bits;
+ 
+ 
 
 ROM InstructionRom 
 (
@@ -56,6 +62,16 @@ RAM_DUAL_READ_PORT DataRam
 	.oDataOut1(     wSourceData1 ),
 	.iMulEnable(	 rMulEnable   ),
 	.iDataInMul(    rResultMul   )
+);
+
+// prueba de 4bits
+
+mul4bits
+(
+	.A(         wSourceData0Prueba       ),
+	.B(  wSourceData1Prueba ),
+	.wResult( rResultMul4bits )
+	
 );
 
 assign wIPInitialValue = (Reset) ? 8'b0 : wDestination;
