@@ -6,5 +6,6 @@
 #	Juan José Delgado Quesada
 #	Jean Pierre Segura Aparicio
 #	Willy Villalobos Marrero
+# Natanael Mojica
 
 # El software creado está disponible para su uso con los debidos créditos
