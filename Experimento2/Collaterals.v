@@ -47,6 +47,29 @@ end//always
 
 endmodule
 
+//Multiplicador ejercicio 2 y 3
+
+module MULTIPLICADOR3 # (parameter SIZE=16)
+(
+	input wire [SIZE-2:2] Ci,
+	input wire [SIZE-1:0] iA,
+	input wire [SIZE-1:0] iB,
+	output reg Co,
+	output reg [SIZE:0] Res
+);
+	assign Ci[0] = 1'b0;
+	assign Res[0] = iA[0]&iB[0];
+	assign Co = Ci[SIZE];
+	
+	genvar i;
+	generate
+		for (i=0; i<SIZE, i=i+1)
+		begin: mult_cell
+			assign {Ci[i+1],Res[i]} = 
+	
+	endgenerate
+
+endmodule
 
 //----------------------------------------------------------------------
 
