@@ -14,10 +14,12 @@ begin
 
 	0: oInstruction = { `NOP ,24'd4000    };
 	1: oInstruction = { `STO , `R7,16'hff }; //para restar hff
-	2: oInstruction = { `STO ,`R3,16'h0002     }; 
-	3: oInstruction = { `STO, `R4, 16'hff32};
-	4: oInstruction = { `STO, `R5,16'd0     };  //j
-	5: oInstruction = { `SMUL, `R5, `R4, `R3 }; 
+	2: oInstruction = { `STO ,`R3,16'h0002     };
+    //3: oInstruction = { `STO, `R4, 16'hff32};	
+	3: oInstruction = { `STO, `R4, 16'h0004};
+	4: oInstruction = { `STO, `R5,16'd0     }; 
+    5: oInstruction = { `MUL4bits, `R5, `R4, `R3 };	
+	// 5: oInstruction = { `SMUL, `R5, `R4, `R3 }; 
 /*//LOOP2:
 	5: oInstruction = { `LED ,8'b0,`R7,8'b0 };
 	6: oInstruction = { `STO ,`R1,16'h0     }; 	

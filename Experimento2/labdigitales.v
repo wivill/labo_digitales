@@ -1,9 +1,9 @@
-module mul4bits(wResult, A, B) ;
-output [15:0]wResult;
-input wire 	[3:0] A, B;
+/* codigo requerido para realizar la multiplicacion de 4 bits, correspondiente a la parte 2 de la gúia de laboratorio*/
+module mul4bits(output reg [15:0]wResult,input wire 	[3:0] A, input wire 	[3:0] B) ;
+
 
 wire WCarry;
-wire[15:0] wResult;
+
 
 
 assign { wResult[0]} = (A[0] & B[0 ]);

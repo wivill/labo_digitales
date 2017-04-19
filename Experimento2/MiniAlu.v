@@ -22,25 +22,17 @@ reg [31:0] 	 TempMul;
 
 wire [7:0]  wSourceAddr0,wSourceAddr1,wDestination;
 wire  [15:0] wSourceData0,wSourceData1,wIPInitialValue,wImmediateValue;
-
-// prueba de 4 bits // el que dice prueba es para el de 4 bits 
-wire  [3:0] wSourceData0Prueba,wSourceData1Prueba
-
 wire signed [15:0] wSourceData0m,wSourceData1m;
+assign wSourceData0m = wSourceData0;
+assign wSourceData1m = wSourceData1;
 
-// prueba de 4bits 
-wire signed [3:0] wSourceData0mPrueba,wSourceData1mPrueba;
 
- assign wSourceData0m = wSourceData0;
- assign wSourceData1m = wSourceData1;
- 
- // prueba de 4 bits
- 
- assign wSourceData0mPrueba = wSourceData0Prueba;
- assign wSourceData1mPrueba = wSourceData1Prueba;
- 
- // prueba de 4 bits, para resultado 
- reg [7:0] 	 rResultMul4bits;
+// prueba de 4 bits // el que dice prueba es para el de 4 bits correspondiente a la parte 2 de la gúia de laboratorio
+//wire  [3:0] wSourceData0Prueba,wSourceData1Prueba
+//wire signed [3:0] wSourceData0mPrueba,wSourceData1mPrueba;
+assign wSourceData0mPrueba = wSourceData0[3:0];
+assign wSourceData1mPrueba = wSourceData1[3:0];
+reg [15:0] 	 rResultMul4bits;
  
  
 
@@ -64,7 +56,7 @@ RAM_DUAL_READ_PORT DataRam
 	.iDataInMul(    rResultMul   )
 );
 
-// prueba de 4bits
+// prueba de 4bits correspondiente a la parte 2 de la gúia de laboratorio
 
 mul4bits
 (
