@@ -2,20 +2,21 @@
 
 /* codigo requerido para realizar la multiplicacion de 4 bits, correspondiente a la parte 2 de la gúia de laboratorio*/
 module mul1bit(
-	output reg wResult,
-	output reg CarryOut,
+	output wire wResult,
+	output wire CarryOut,
 	input wire CarryIn,
 	input wire 	 A, 
-	input wire 	 B) ;
+	input wire 	 B
+	);
 
-assign {CarryOut, wResult} = (A + B) + CarryIn;
+assign {CarryOut, wResult} = (A + B + CarryIn);
 	
 endmodule
 
 
 
 module mul4bits(
-	output reg [15:0]wResult,
+	output wire [15:0]wResult,
 	input wire 	[3:0] A, 
 	input wire 	[3:0] B) ;
 	//caja1
@@ -56,23 +57,51 @@ module mul4bits(
 	wire carry4Bsalida;
 	wire resultado4Bsalida;
 	
-mul1bit cajamodo1 (wResult[1],carry1salida, 0'b1, (A[0] & B[1 ]),A[1] & B[0 ] );
+	//caja4C
+	wire caja4C;
+	wire carry4Csalida;
+	wire resultado4Csalida;
+	
+	//caja5A
+	wire caja5A;
+	wire carry5Asalida;
+	wire resultado5Asalida;
+	
+	//caja5B
+	wire caja5B;
+	wire carry5Bsalida;
+	wire resultado5Bsalida;
+	
+	//caja6
+	wire caja6;
+	wire carry6salida;
+	wire resultado6salida;
+	
+assign wResult[0] = A[0] & B[0 ] ;
+	
+mul1bit cajamodo1 (wResult[1],carry1salida, 1'b0, (A[0] & B[1 ]),A[1] & B[0 ] );
 
 mul1bit cajamodo2a (resultado2asalida,carry2asalida, carry1salida, (A[2] & B[0 ]),A[1] & B[1 ] );
 
-mul1bit cajamodo2B (wResult[2],carry2Bsalida,  0'b1, resultado2asalida,A[0] & B[2 ] );
+mul1bit cajamodo2B (wResult[2],carry2Bsalida,  1'b0, resultado2asalida,A[0] & B[2 ] );
 
 mul1bit cajamodo3A(resultado3Asalida,carry3Asalida,  carry2asalida, A[2] & B[1 ],A[3] & B[0 ] );
 
 mul1bit cajamodo3B(resultado3Bsalida,carry3Bsalida,  carry2Bsalida, resultado3Asalida,A[1] & B[2 ] );
 
-mul1bit cajamodo3C(wResult[3],carry3Csalida,  0'b1, resultado3Bsalida,A[0] & B[3 ] );
+mul1bit cajamodo3C(wResult[3],carry3Csalida,  1'b0, resultado3Bsalida,A[0] & B[3 ] );
 
-mul1bit cajamodo4A(resultado4Asalida,carry4Asalida,  carry3Asalida,0'b1,A[3] & B[1 ] );
+mul1bit cajamodo4A(resultado4Asalida,carry4Asalida,  carry3Asalida,1'b0,A[3] & B[1 ] );
 
-mul1bit cajamodo4B(resultado4Asalida,carry4Asalida,  carry3Asalida,0'b1,A[3] & B[1 ] );
+mul1bit cajamodo4B(resultado4Bsalida,carry4Bsalida,  carry3Bsalida,resultado4Asalida,A[2] & B[2 ] );
 
+mul1bit cajamodo4C(wResult[4],carry4Csalida,  carry3Csalida,resultado4Bsalida,A[1] & B[3 ] );
 
+mul1bit cajamodo5A(resultado5Asalida,carry5Asalida,  carry4Bsalida,carry4Asalida,A[3] & B[2 ] );
+
+mul1bit cajamodo5B(wResult[5],carry5Bsalida,  carry4Csalida,resultado5Asalida,A[2] & B[3 ] );
+
+mul1bit cajamodo6(wResult[6],wResult[7],  carry5Bsalida,carry5Asalida,A[3] & B[3 ] );
 
 endmodule
 
