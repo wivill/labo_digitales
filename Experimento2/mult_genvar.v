@@ -1,3 +1,5 @@
+`include "labdigitales.v"
+
 module MULTIPLICADOR3 # (parameter SIZE=16)
 (
 	input wire [SIZE-1:0] iA,
@@ -7,6 +9,10 @@ module MULTIPLICADOR3 # (parameter SIZE=16)
 	output reg [SIZE:0] Res,
 	output reg [2*SIZE-1:0] out
 );
+
+// mul1bit celda(
+// 	out
+// 	)
 
 wire Ci;
 
