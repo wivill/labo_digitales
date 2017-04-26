@@ -46,6 +46,47 @@ begin
 end//always
 
 endmodule
+//----------------------------------------------------------------------
+module MUX # ( parameter SIZE=16 )
+(
+	input wire						Clock,
+	input wire [SIZE-1:0]		in0,
+	input wire [SIZE-1:0]		in1,
+	input wire [SIZE-1:0]  		in2,
+	input wire [SIZE-1:0]		in3,
+	input wire [1:0]				select,
+	output reg [SIZE-1:0]	   out
+);
+
+always @ (*) 
+begin
+		case(select)
+			2'b00 :
+				begin
+					out <= in0;
+				end
+			2'b01 :
+				begin
+					out <= in1;
+				end
+			2'b10 :
+				begin
+					out <= in2;
+				end
+			2'b11 :
+				begin
+					out <= in3;
+				end
+			default :
+				begin
+					out <= 16'hCAFE;
+				end
+		endcase	
+ 
+end//always
+
+endmodule
+//----------------------------------------------------------------------
 
 //Multiplicador ejercicio 2 y 3
 

@@ -18,14 +18,23 @@ begin
     //3: oInstruction = { `STO, `R4, 16'hff32};	
 	3: oInstruction = { `STO, `R4, 16'h0004};
 	4: oInstruction = { `STO, `R5,16'd0     }; 
-    5: oInstruction = { `MUL4bits, `R5, `R4, `R3 };	
+    	5: oInstruction = { `MUL4bits, `R5, `R4, `R3 };	
     /* instrucciones para multiplicación a 16 bits, parte alta del resultado se guarda en 
     registro R8 de la ram, y la parte baja se guarda en el registro indicado en la instrucción
     */
-    6: oInstruction = { `STO ,`R3,16'sh8002 };//-2
+    	6: oInstruction = { `STO ,`R3,16'sh8002 };//-2
 	7: oInstruction = { `STO, `R4, 16'sh0008};// 8
 	8: oInstruction = { `STO, `R5,16'd0     }; 	// guarda parte baja en registro R5
-	9: oInstruction = { `SMUL, `R5, `R4, `R3 }; 
+	9: oInstruction = { `SMUL, `R5, `R4, `R3 };
+	10: oInstruction = { `STO, `R7, 16'hfff }; //para restar hff
+	11: oInstruction = { `STO, `R3, 16'h1129     }; 
+	12: oInstruction = { `STO, `R4, 16'h0036};
+	13: oInstruction = { `STO, `R2, 16'h1136};
+	14: oInstruction = { `STO, `R5, 16'd0     };  //j
+	15: oInstruction = { `MUL2, `R5, `R4, `R3 }; 
+	16: oInstruction = { `MUL2, `R5, `R4, `R7 };
+	17: oInstruction = { `MUL2, `R5, `R2, `R7 };
+
 	default:
 		oInstruction = { `LED ,  24'b10101010 };		//NOP
 	endcase	
