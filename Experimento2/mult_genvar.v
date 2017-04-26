@@ -4,46 +4,42 @@ module MULTIPLICADOR3 # (parameter SIZE=16)
 (
 	input wire [SIZE-1:0] iA,
 	input wire [SIZE-1:0] iB,
-	output reg Co,
-	// output reg [2*SIZE - 1:0] Res,
-	output reg [SIZE:0] Res,
-	output reg [2*SIZE-1:0] out
+	output wire Co,
+	output wire [SIZE:0] Res,
+	output wire [2*SIZE-1:0] out
 );
+wire [SIZE-1:0] Ci; // Considerar si se ocupa o no
+
+// module mul1bit(
+// 	output wire wResult,
+// 	output wire CarryOut,
+// 	input wire CarryIn,
+// 	input wire 	 A,
+// 	input wire 	 B
+// 	);
+
 
 // mul1bit celda(
-// 	out
-// 	)
-
-wire Ci;
-
+// 	.wResult(Res),
+// 	.CarryOut(Co),
+// 	.CarryIn(Ci), // Considerar si se ocupa o no
+// 	.A(iA),
+// 	.B(iB)
+// 	);
 
 	genvar i,j; // Variables que usan los FOR statement para instanciar en compilación cada bloque
-	// genvar j;
 	generate
 		for (i=0; i<SIZE-1; i=i+1) begin
-
 			if (i==0) begin
-				always @ ( * ) begin
-					Res[i] = iA[i]&iB[i];
+				assign out[0] = iA[0]&iB[0];
 
-					generate
-						for (j=1; j<SIZE-1; j=j+1) begin
-							{Ci, Res[j]} = iA[j]&iB[i] + iA[j-1]&iB[i+1] + Ci;
-						end
-					endgenerate
+			end
+			else begin : CELL
+				for (j=0; j<SIZE-1; j=j+1) begin
 
-					Res[SIZE] = iA[SIZE-1]&iB[i+1] + Ci;
 
 				end
-
-
 			end
-
-			else begin
-
-			end
-
-
 		end
 	endgenerate
 
