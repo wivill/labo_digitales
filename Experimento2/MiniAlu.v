@@ -17,14 +17,42 @@ reg         rWriteEnable, rMulEnable, rBranchTaken;
 wire [27:0] wInstruction;
 wire [3:0]  wOperation;
 reg [15:0]   rResult;
-reg [15:0] 	 rResultMul;
-reg [31:0] 	 TempMul;
 
-wire [7:0]  wSourceAddr0,wSourceAddr1,wDestination;
-wire  [15:0] wSourceData0,wSourceData1,wIPInitialValue,wImmediateValue;
-wire signed [15:0] wSourceData0m,wSourceData1m;
+wire [7:0]  wSourceAddr0, wSourceAddr1, wDestination;
+wire  [15:0] wSourceData0, wSourceData1, wIPInitialValue, wImmediateValue;
+
+//************************* Parte 1 Lboratorio cables y registros usados *********************************
+
+/* cables internos conectados a las entradas y utilizados en la multiplicación de dos numeros de 16 bits con signo
+, indicado en la parte 1 del laboratorio
+*/
+wire signed [15:0] wSourceData0m;
+wire signed [15:0] wSourceData1m; 
+
+/*
+registro de 32 bits, temporal que almacena el 
+resultado de la multiplicacion de dos numeros de 16 bits con signo
+parte 1 del laboratorio
+*/
+reg signed [31:0] 	 TempMul;
+reg signed [31:0] 	 tmp;
+//wire signed [31:0]   tmp2;
+
+/* registro donde se guarda la parte alta de la multiplicación
+a 16 bits con signo, parte 1 del laboratorio
+*/
+reg [15:0] 	 rResultMul;
+
 assign wSourceData0m = wSourceData0;
 assign wSourceData1m = wSourceData1;
+
+wire signed [31:0]   tmp2 = wSourceData0m * wSourceData1m;
+
+//*************************//********************************************************************
+
+
+
+
 
 
 // prueba de 4 bits // el que dice prueba es para el de 4 bits correspondiente a la parte 2 de la gúia de laboratorio
@@ -53,7 +81,7 @@ RAM_DUAL_READ_PORT DataRam
 	.oDataOut0(     wSourceData0 ),
 	.oDataOut1(     wSourceData1 ),
 	.iMulEnable(	 rMulEnable   ),
-	.iDataInMul(    rResultMul   )
+	.iDataInMul(    rResultMul   )// conectar este registro a la RAM y asignarlo al registro no.9 de la RAM
 );
 
 // prueba de 4bits correspondiente a la parte 2 de la gúia de laboratorio
@@ -192,12 +220,17 @@ begin
 		rBranchTaken <= 1'b0;
 	end
 	//-------------------------------------
+	/* Instrucción para multiplicacion de dos numeros de 16 bits
+	modificando la RAM, parte 1 del laboratorio
+	*/
 	`SMUL:
 	begin
 		rFFLedEN     <= 1'b1;
 		rWriteEnable <= 1'b1;
 		rMulEnable   <= 1'b1;
 		TempMul      <= wSourceData1m * wSourceData0m;
+		rResult      <= 16'h0000;
+		rResultMul   <= 16'h0000;
 		rResult      <= TempMul[15:0];
 		rResultMul   <= TempMul[31:16];
 		rBranchTaken <= 1'b0;
