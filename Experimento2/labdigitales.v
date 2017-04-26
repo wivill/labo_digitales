@@ -2,21 +2,21 @@
 
 /* codigo requerido para realizar la multiplicacion de 4 bits, correspondiente a la parte 2 de la gúia de laboratorio*/
 module mul1bit(
-	output wire wResult,
+	output wire wResult1,
 	output wire CarryOut,
 	input wire CarryIn,
 	input wire 	 A, 
 	input wire 	 B
 	);
 
-assign {CarryOut, wResult} = (A + B + CarryIn);
+assign {CarryOut, wResult1} = (A + B + CarryIn);
 	
 endmodule
 
 
 
 module mul4bits(
-	output wire [15:0]wResult,
+	output wire[15:0]wResult,
 	input wire 	[3:0] A, 
 	input wire 	[3:0] B) ;
 	//caja1
@@ -76,6 +76,15 @@ module mul4bits(
 	wire caja6;
 	wire carry6salida;
 	wire resultado6salida;
+	
+assign wResult[8] =  1'b0 ;	
+assign wResult[9] = 1'b0 ;
+assign wResult[10] = 1'b0 ;
+assign wResult[11] = 1'b0 ;
+assign wResult[12] = 1'b0 ;
+assign wResult[13] = 1'b0 ;
+assign wResult[14] = 1'b0 ;
+assign wResult[15] = 1'b0 ;
 	
 assign wResult[0] = A[0] & B[0 ] ;
 	

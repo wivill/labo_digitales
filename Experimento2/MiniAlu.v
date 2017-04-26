@@ -58,11 +58,16 @@ wire signed [31:0]   tmp2 = wSourceData0m * wSourceData1m;
 // prueba de 4 bits // el que dice prueba es para el de 4 bits correspondiente a la parte 2 de la gúia de laboratorio
 //wire  [3:0] wSourceData0Prueba,wSourceData1Prueba
 //wire signed [3:0] wSourceData0mPrueba,wSourceData1mPrueba;
-assign wSourceData0mPrueba = wSourceData0[3:0];
-assign wSourceData1mPrueba = wSourceData1[3:0];
-reg [15:0] 	 rResultMul4bits;
+//assign wSourceData0mPrueba = wSourceData0[3:0];
+//assign wSourceData1mPrueba = wSourceData1[3:0];
+wire [15:0] 	 rResultMul4bits;
  
- 
+mul4bits multiplicador4bits
+(
+	.A(4'd5   ),//wSourceData1m),//4'd5  ),//wSourceData0), //4'd5  ),   //  wSourceData1mPrueba	),
+	.B(4'd5  ),//wSourceData1m),//4'd2  ), // wSourceData1), //4'd4  ), //wSourceData0mPrueba),
+	.wResult( rResultMul4bits )
+); 
 
 ROM InstructionRom 
 (
@@ -84,15 +89,8 @@ RAM_DUAL_READ_PORT DataRam
 	.iDataInMul(    rResultMul   )// conectar este registro a la RAM y asignarlo al registro no.9 de la RAM
 );
 
-// prueba de 4bits correspondiente a la parte 2 de la gúia de laboratorio
 
-mul4bits
-(
-	.A(         wSourceData0Prueba       ),
-	.B(  wSourceData1Prueba ),
-	.wResult( rResultMul4bits )
-	
-);
+
 
 assign wIPInitialValue = (Reset) ? 8'b0 : wDestination;
 UPCOUNTER_POSEDGE IP
