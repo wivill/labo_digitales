@@ -64,8 +64,8 @@ wire [15:0] 	 rResultMul4bits;
  
 mul4bits multiplicador4bits
 (
-	.A(4'd5   ),//wSourceData1m),//4'd5  ),//wSourceData0), //4'd5  ),   //  wSourceData1mPrueba	),
-	.B(4'd5  ),//wSourceData1m),//4'd2  ), // wSourceData1), //4'd4  ), //wSourceData0mPrueba),
+	.A(wSourceData0m   ),//wSourceData1m),//4'd5  ),//wSourceData0), //4'd5  ),   //  wSourceData1mPrueba	),
+	.B(wSourceData1m  ),//wSourceData1m),//4'd2  ), // wSourceData1), //4'd4  ), //wSourceData0mPrueba),
 	.wResult( rResultMul4bits )
 ); 
 
