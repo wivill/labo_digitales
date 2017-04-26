@@ -19,20 +19,13 @@ begin
 	3: oInstruction = { `STO, `R4, 16'h0004};
 	4: oInstruction = { `STO, `R5,16'd0     }; 
     5: oInstruction = { `MUL4bits, `R5, `R4, `R3 };	
-	// 5: oInstruction = { `SMUL, `R5, `R4, `R3 }; 
-/*//LOOP2:
-	5: oInstruction = { `LED ,8'b0,`R7,8'b0 };
-	6: oInstruction = { `STO ,`R1,16'h0     }; 	
-	7: oInstruction = { `STO ,`R2,16'd500 };
-//LOOP1:	
-	8: oInstruction = { `ADD ,`R1,`R1,`R3    }; 
-	9: oInstruction = { `BLE ,`LOOP1,`R1,`R2 }; 
-	
-	10: oInstruction = { `ADD ,`R5,`R5,`R3    };
-	11: oInstruction = { `BLE ,`LOOP2,`R5,`R4 };	
-	12: oInstruction = { `NOP ,24'd4000       }; 
-	13: oInstruction = { `SUB ,`R7,`R7,`R3    };
-	14: oInstruction = { `JMP ,  8'd2,16'b0   };*/
+    /* instrucciones para multiplicación a 16 bits, parte alta del resultado se guarda en 
+    registro R8 de la ram, y la parte baja se guarda en el registro indicado en la instrucción
+    */
+    6: oInstruction = { `STO ,`R3,16'sh8002 };//-2
+	7: oInstruction = { `STO, `R4, 16'sh0008};// 8
+	8: oInstruction = { `STO, `R5,16'd0     }; 	// guarda parte baja en registro R5
+	9: oInstruction = { `SMUL, `R5, `R4, `R3 }; 
 	default:
 		oInstruction = { `LED ,  24'b10101010 };		//NOP
 	endcase	
