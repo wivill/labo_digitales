@@ -22,14 +22,19 @@
 
 `define STATE_RESET 				 0
 `define STATE_WAIT_15 			 1
-`define STATE_TIMER_RESET 		 2
+`define STATE_TIMER_RESET1		 2
 `define STATE_POWERON_INIT_1   3
 `define STATE_POWERON_INIT_2   4
 `define STATE_WAIT_2   			 5
-`define STATE_FUNCTION_SET 	 6
-`define STATE_ENTRY_MODE   	 7
-`define STATE_DISPLAY_CONTROL  8
-`define STATE_DISPLAY_CLEAR    9
+`define STATE_TIMER_RESET2		 6
+`define STATE_FUNCTION_SET1 	 7
+`define STATE_FUNCTION_SET2 	 8
+`define STATE_ENTRY_MODE1  	 9
+`define STATE_ENTRY_MODE2  	 10
+`define STATE_DISPLAY_CONTROL1 11
+`define STATE_DISPLAY_CONTROL2 12
+`define STATE_DISPLAY_CLEAR1   13
+`define STATE_DISPLAY_CLEAR2   14
 
 
 module Module_LCD_Control
@@ -53,6 +58,7 @@ wire wWriteDone;
 //----------------------------------------------
 //Variables nuevas:
 reg [2:0] prox_wait_state = 0;
+reg [2:0] prox_wait_state2 = 0;
 //--------------------------------------------
 
 //Next State and delay logic
@@ -102,24 +108,19 @@ The 15 ms interval is 750,000 clock cycles at 50 MHz.
 
 		if (rTimeCount > 32'd750000 ) begin
 			prox_wait_state = prox_wait_state + 1;
-			rNextState = `STATE_TIMER_RESET;
+			rNextState = `STATE_TIMER_RESET1;
 		end else begin
 			rNextState = `STATE_WAIT_15;
 		end
 	end
 //------------------------------------------
 
-	`STATE_TIMER_RESET:
+	`STATE_TIMER_RESET1:
 	begin
 		rWrite_Enabled = 1'b0;
 		oLCD_Data = 4'h0;
 		oLCD_RegisterSelect = 1'b0; //these are commands
 		rTimeCountReset = 1'b1; //Reset the counter here
-		if(prox_wait_state == 1)
-		begin
-			rNextState = `STATE_POWERON_INIT_1;
-		end
-
 		case(prox_wait_state)
 		1:
 		begin
@@ -139,16 +140,17 @@ The 15 ms interval is 750,000 clock cycles at 50 MHz.
 		end
 		5:
 		begin
-			rNextState = `STATE_FUNCTION_SET;
+			rNextState = `STATE_FUNCTION_SET1;
 		end
 		default:
 		begin
-			rNextState = `STATE_FUNCTION_SET;
+			rNextState = `STATE_FUNCTION_SET1;            //FIXME
 		end
 		endcase
 	end
 
 //------------------------------------------
+
 	`STATE_POWERON_INIT_1:
 	begin
 		rWrite_Enabled = 1'b1;
@@ -169,15 +171,63 @@ Wait 4.1 ms or longer, which is 205,000 clock cycles at 50 MHz.
 	`STATE_WAIT_2:
 	begin
 		rWrite_Enabled = 1'b0;
-		oLCD_Data = 4'h3;
+		oLCD_Data = 4'h0;
 		oLCD_RegisterSelect = 1'b0; //these are commands
 		rTimeCountReset = 1'b0;
 
 		if (rTimeCount > 32'd102500 )
-			rNextState = `STATE_FUNCTION_SET;
-		else
+		begin
+			prox_wait_state2 = prox_wait_state2 + 1;
+			rNextState = `STATE_TIMER_RESET2;
+		end else begin
 			rNextState = `STATE_WAIT_2;
+		end
 	end
+	
+	//------------------------------------------
+
+	`STATE_TIMER_RESET2:
+	begin
+		rWrite_Enabled = 1'b0;
+		oLCD_Data = 4'h0;
+		oLCD_RegisterSelect = 1'b0; //these are commands
+		rTimeCountReset = 1'b1; //Reset the counter here
+		case(prox_wait_state2)
+		1:
+		begin
+			rNextState = `STATE_FUNCTION_SET2;
+		end
+		2:
+		begin
+			rNextState = `STATE_ENTRY_MODE1;
+		end
+		3:
+		begin
+			rNextState = `STATE_ENTRY_MODE2;
+		end
+		4:
+		begin
+			rNextState = `STATE_DISPLAY_CONTROL1;
+		end
+		5:
+		begin
+			rNextState = `STATE_DISPLAY_CONTROL2;
+		end
+		6:
+		begin
+			rNextState = `STATE_DISPLAY_CLEAR1;
+		end
+		7:
+		begin
+			rNextState = `STATE_DISPLAY_CLEAR2;
+		end
+		default:
+		begin
+			rNextState = `STATE_FUNCTION_SET1;                //FIXME
+		end
+		endcase
+	end
+	
 //------------------------------------------
 
 	`STATE_POWERON_INIT_2:
@@ -194,64 +244,120 @@ Wait 4.1 ms or longer, which is 205,000 clock cycles at 50 MHz.
 	end
 //------------------------------------------
 
-	`STATE_FUNCTION_SET:
+	`STATE_FUNCTION_SET1:
 	begin
 		rWrite_Enabled = 1'b1;
-		oLCD_Data = 4'b0001; // 2
-		// delay
-		oLCD_Data = 4'b1100; // 8
+		oLCD_Data = 4'b0010; // 2
 		oLCD_RegisterSelect = 1'b0; //these are commands
 		rTimeCountReset = 1'b1;
 
 		if ( wWriteDone )
-			rNextState = `STATE_ENTRY_MODE;
+			rNextState = `STATE_WAIT_2;
 		else
-			rNextState = `STATE_FUNCTION_SET;
+			rNextState = `STATE_FUNCTION_SET1;
+	end
+	
+	//------------------------------------------
+
+	`STATE_FUNCTION_SET2:
+	begin
+		rWrite_Enabled = 1'b1;
+		oLCD_Data = 4'b1000; // 8
+		oLCD_RegisterSelect = 1'b0; //these are commands
+		rTimeCountReset = 1'b1;
+
+		if ( wWriteDone )
+			rNextState = `STATE_WAIT_2;
+		else
+			rNextState = `STATE_FUNCTION_SET2;
+	end
+	
+//------------------------------------------
+
+	`STATE_ENTRY_MODE1:
+	begin
+		rWrite_Enabled = 1'b1;
+		oLCD_Data = 4'b0000;
+		oLCD_RegisterSelect = 1'b0; //these are commands
+		rTimeCountReset = 1'b1;
+		if ( wWriteDone )
+			rNextState = `STATE_WAIT_2;
+		else
+			rNextState = `STATE_ENTRY_MODE1;
 	end
 
 //------------------------------------------
 
-	`STATE_ENTRY_MODE:
+	`STATE_ENTRY_MODE2:
 	begin
 		rWrite_Enabled = 1'b1;
-		oLCD_Data = 4'h06;
+		oLCD_Data = 4'b1100;
 		oLCD_RegisterSelect = 1'b0; //these are commands
 		rTimeCountReset = 1'b1;
-
 		if ( wWriteDone )
-			rNextState = `STATE_DISPLAY_CONTROL;
+			rNextState = `STATE_WAIT_2;
 		else
-			rNextState = `STATE_ENTRY_MODE;
+			rNextState = `STATE_ENTRY_MODE2;
 	end
 
 //------------------------------------------
 
-	`STATE_DISPLAY_CONTROL:
+	`STATE_DISPLAY_CONTROL1:
 	begin
 		rWrite_Enabled = 1'b1;
-		oLCD_Data = 4'h0F;
+		oLCD_Data = 4'b0000;
 		oLCD_RegisterSelect = 1'b0; //these are commands
 		rTimeCountReset = 1'b1;
 
 		if ( wWriteDone )
-			rNextState = `STATE_DISPLAY_CLEAR;
+			rNextState = `STATE_WAIT_2;
 		else
-			rNextState = `STATE_DISPLAY_CONTROL;
+			rNextState = `STATE_DISPLAY_CONTROL1;
 	end
 
 //------------------------------------------
 
-	`STATE_DISPLAY_CLEAR:
+	`STATE_DISPLAY_CONTROL2:
 	begin
 		rWrite_Enabled = 1'b1;
-		oLCD_Data = 4'h01;
+		oLCD_Data = 4'b1111;
 		oLCD_RegisterSelect = 1'b0; //these are commands
 		rTimeCountReset = 1'b1;
 
 		if ( wWriteDone )
-			rNextState = `STATE_DISPLAY_CLEAR;
+			rNextState = `STATE_WAIT_2;
 		else
-			rNextState = `STATE_DISPLAY_CONTROL;
+			rNextState = `STATE_DISPLAY_CONTROL2;
+	end
+
+//------------------------------------------
+
+	`STATE_DISPLAY_CLEAR1:
+	begin
+		rWrite_Enabled = 1'b1;
+		oLCD_Data = 4'b0000;
+		oLCD_RegisterSelect = 1'b0; //these are commands
+		rTimeCountReset = 1'b1;
+
+		if ( wWriteDone )
+			rNextState = `STATE_WAIT_2;
+		else
+			rNextState = `STATE_DISPLAY_CLEAR1;
+	end
+
+//------------------------------------------
+
+	`STATE_DISPLAY_CLEAR2:
+	begin
+		rWrite_Enabled = 1'b1;
+		oLCD_Data = 4'b0001;
+		oLCD_RegisterSelect = 1'b0; //these are commands
+		rTimeCountReset = 1'b1;
+
+		if ( wWriteDone )
+			rNextState = `STATE_DISPLAY_CLEAR2;
+		else
+			rNextState = `STATE_DISPLAY_CLEAR2;
 	end
 
 //------------------------------------------
