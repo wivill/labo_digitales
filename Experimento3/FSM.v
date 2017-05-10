@@ -75,12 +75,12 @@ begin
 	
 	if (enable_wait_1)
 	begin
-		prox_wait_state = prox_wait_state + 1;
+		prox_wait_state = prox_wait_state + 4'b0001;
 	end 
 	
 	if (enable_wait_2)
 	begin
-		prox_wait_state2 = prox_wait_state2 + 1;
+		prox_wait_state2 = prox_wait_state2 + 4'b0001;
 	end 
 	
 end
@@ -190,11 +190,9 @@ The 15 ms interval is 750,000 clock cycles at 50 MHz.
 		enable_wait_1 = 0;
 		enable_wait_2 = 0;
 
-		if ( wWriteDone )
-			rNextState = `STATE_WAIT_15;
-		else
-			rNextState = `STATE_POWERON_INIT_1;
+		rNextState = `STATE_WAIT_15;
 	end
+
 //------------------------------------------
 /*
 Wait 4.1 ms or longer, which is 205,000 clock cycles at 50 MHz.
@@ -275,10 +273,7 @@ Wait 4.1 ms or longer, which is 205,000 clock cycles at 50 MHz.
 		enable_wait_1 = 0;
 		enable_wait_2 = 0;
 
-		if ( wWriteDone )
-			rNextState = `STATE_WAIT_15;
-		else
-			rNextState = `STATE_POWERON_INIT_2;
+		rNextState = `STATE_WAIT_15;
 	end
 //------------------------------------------
 
@@ -291,10 +286,7 @@ Wait 4.1 ms or longer, which is 205,000 clock cycles at 50 MHz.
 		enable_wait_1 = 0;
 		enable_wait_2 = 0;
 
-		if ( wWriteDone )
-			rNextState = `STATE_WAIT_2;
-		else
-			rNextState = `STATE_FUNCTION_SET1;
+		rNextState = `STATE_WAIT_2;
 	end
 	
 	//------------------------------------------
@@ -308,10 +300,7 @@ Wait 4.1 ms or longer, which is 205,000 clock cycles at 50 MHz.
 		enable_wait_1 = 0;
 		enable_wait_2 = 0;
 
-		if ( wWriteDone )
-			rNextState = `STATE_WAIT_2;
-		else
-			rNextState = `STATE_FUNCTION_SET2;
+		rNextState = `STATE_WAIT_2;
 	end
 	
 //------------------------------------------
@@ -324,10 +313,8 @@ Wait 4.1 ms or longer, which is 205,000 clock cycles at 50 MHz.
 		rTimeCountReset = 1'b1;
 		enable_wait_1 = 0;
 		enable_wait_2 = 0;
-		if ( wWriteDone )
-			rNextState = `STATE_WAIT_2;
-		else
-			rNextState = `STATE_ENTRY_MODE1;
+
+		rNextState = `STATE_WAIT_2;
 	end
 
 //------------------------------------------
@@ -340,10 +327,8 @@ Wait 4.1 ms or longer, which is 205,000 clock cycles at 50 MHz.
 		rTimeCountReset = 1'b1;
 		enable_wait_1 = 0;
 		enable_wait_2 = 0;
-		if ( wWriteDone )
-			rNextState = `STATE_WAIT_2;
-		else
-			rNextState = `STATE_ENTRY_MODE2;
+
+		rNextState = `STATE_WAIT_2;
 	end
 
 //------------------------------------------
@@ -356,10 +341,8 @@ Wait 4.1 ms or longer, which is 205,000 clock cycles at 50 MHz.
 		rTimeCountReset = 1'b1;
 		enable_wait_1 = 0;
 		enable_wait_2 = 0;
-		if ( wWriteDone )
-			rNextState = `STATE_WAIT_2;
-		else
-			rNextState = `STATE_DISPLAY_CONTROL1;
+
+		rNextState = `STATE_WAIT_2;
 	end
 
 //------------------------------------------
@@ -373,10 +356,7 @@ Wait 4.1 ms or longer, which is 205,000 clock cycles at 50 MHz.
 		enable_wait_1 = 0;
 		enable_wait_2 = 0;
 
-		if ( wWriteDone )
-			rNextState = `STATE_WAIT_2;
-		else
-			rNextState = `STATE_DISPLAY_CONTROL2;
+		rNextState = `STATE_WAIT_2;
 	end
 
 //------------------------------------------
@@ -390,10 +370,7 @@ Wait 4.1 ms or longer, which is 205,000 clock cycles at 50 MHz.
 		enable_wait_1 = 0;
 		enable_wait_2 = 0;
 
-		if ( wWriteDone )
-			rNextState = `STATE_WAIT_2;
-		else
-			rNextState = `STATE_DISPLAY_CLEAR1;
+		rNextState = `STATE_WAIT_2;
 	end
 
 //------------------------------------------
@@ -407,10 +384,7 @@ Wait 4.1 ms or longer, which is 205,000 clock cycles at 50 MHz.
 		enable_wait_1 = 0;
 		enable_wait_2 = 0;
 
-		if ( wWriteDone )
-			rNextState = `STATE_DISPLAY_CLEAR2;
-		else
-			rNextState = `STATE_DISPLAY_CLEAR2;
+		rNextState = `STATE_DISPLAY_CLEAR2;
 	end
 
 //------------------------------------------
