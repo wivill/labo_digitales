@@ -1,21 +1,20 @@
 `timescale 1ns / 1ps
 //////////////////////////////////////////////////////////////////////////////////
-// Company: 
-// Engineer: 
-// 
-// Create Date:    07:48:57 05/03/2017 
-// Design Name: 
-// Module Name:    FSM 
-// Project Name: 
-// Target Devices: 
-// Tool versions: 
-// Description: 
+// Company:
+// Engineer:
 //
-// Dependencies: 
+// Create Date:    07:48:57 05/03/2017
+// Design Name:
+// Module Name:    FSM
+// Project Name:
+// Target Devices:
+// Tool versions:
+// Description:
 //
-// Revision: 
+// Dependencies:
+//
+// Revision:
 // Revision 0.01 - File Created
-// Additional Comments: 
 //
 //////////////////////////////////////////////////////////////////////////////////
 
@@ -45,7 +44,7 @@ output reg[3:0] oLCD_Data
 );
 
 reg rWrite_Enabled;
-assign oLCD_ReadWrite = 0; //I only Write to the LCD display, never Read from it
+assign oLCD_ReadWrite = 0;  //I Write to the LCD display, never Read from it
 assign oLCD_StrataFlashControl = 1; //StrataFlash disabled. Full read/write access to LCD
 reg [7:0] rCurrentState,rNextState;
 reg [31:0] rTimeCount;
@@ -59,21 +58,19 @@ reg [2:0] prox_wait_state = 0;
 //Next State and delay logic
 always @ ( posedge Clock )
 begin
-	if (Reset)
-	begin
+	if (Reset) begin
 		rCurrentState <= `STATE_RESET;
 		rTimeCount <= 32'b0;
-	end
-	else
-	begin
-		if (rTimeCountReset)
+	end else begin
+		if (rTimeCountReset) begin
 			rTimeCount <= 32'b0;
-		else
+		end else begin
 			rTimeCount <= rTimeCount + 32'b1;
 			rCurrentState <= rNextState;
+		end
 	end
 end
-	
+
 //----------------------------------------------
 //Current state and output logic
 
@@ -87,7 +84,7 @@ begin
 		oLCD_Data = 4'h0;
 		oLCD_RegisterSelect = 1'b0;
 		rTimeCountReset = 1'b0;
-		
+
 		rNextState = `STATE_WAIT_15;
 	end
 //------------------------------------------
@@ -102,7 +99,7 @@ The 15 ms interval is 750,000 clock cycles at 50 MHz.
 		oLCD_Data = 4'h0;
 		oLCD_RegisterSelect = 1'b0; //these are commands
 		rTimeCountReset = 1'b0;
-		
+
 		if (rTimeCount > 32'd750000 ) begin
 			prox_wait_state = prox_wait_state + 1;
 			rNextState = `STATE_TIMER_RESET;
@@ -122,12 +119,12 @@ The 15 ms interval is 750,000 clock cycles at 50 MHz.
 		begin
 			rNextState = `STATE_POWERON_INIT_1;
 		end
-		
+
 		case(prox_wait_state)
 		1:
 		begin
 			rNextState = `STATE_POWERON_INIT_1;
-		end 
+		end
 		2:
 		begin
 			rNextState = `STATE_POWERON_INIT_1;
@@ -150,7 +147,7 @@ The 15 ms interval is 750,000 clock cycles at 50 MHz.
 		end
 		endcase
 	end
-	
+
 //------------------------------------------
 	`STATE_POWERON_INIT_1:
 	begin
@@ -158,7 +155,7 @@ The 15 ms interval is 750,000 clock cycles at 50 MHz.
 		oLCD_Data = 4'h3;
 		oLCD_RegisterSelect = 1'b0; //these are commands
 		rTimeCountReset = 1'b1;
-		
+
 		if ( wWriteDone )
 			rNextState = `STATE_WAIT_15;
 		else
@@ -175,7 +172,7 @@ Wait 4.1 ms or longer, which is 205,000 clock cycles at 50 MHz.
 		oLCD_Data = 4'h3;
 		oLCD_RegisterSelect = 1'b0; //these are commands
 		rTimeCountReset = 1'b0;
-		
+
 		if (rTimeCount > 32'd102500 )
 			rNextState = `STATE_FUNCTION_SET;
 		else
@@ -189,7 +186,7 @@ Wait 4.1 ms or longer, which is 205,000 clock cycles at 50 MHz.
 		oLCD_Data = 4'h2;
 		oLCD_RegisterSelect = 1'b0; //these are commands
 		rTimeCountReset = 1'b1;
-		
+
 		if ( wWriteDone )
 			rNextState = `STATE_WAIT_15;
 		else
@@ -200,17 +197,19 @@ Wait 4.1 ms or longer, which is 205,000 clock cycles at 50 MHz.
 	`STATE_FUNCTION_SET:
 	begin
 		rWrite_Enabled = 1'b1;
-		oLCD_Data = 4'h28;
+		oLCD_Data = 4'b0001; // 2
+		// delay
+		oLCD_Data = 4'b1100; // 8
 		oLCD_RegisterSelect = 1'b0; //these are commands
 		rTimeCountReset = 1'b1;
-		
+
 		if ( wWriteDone )
 			rNextState = `STATE_ENTRY_MODE;
 		else
 			rNextState = `STATE_FUNCTION_SET;
 	end
-	
-//------------------------------------------	
+
+//------------------------------------------
 
 	`STATE_ENTRY_MODE:
 	begin
@@ -218,14 +217,14 @@ Wait 4.1 ms or longer, which is 205,000 clock cycles at 50 MHz.
 		oLCD_Data = 4'h06;
 		oLCD_RegisterSelect = 1'b0; //these are commands
 		rTimeCountReset = 1'b1;
-		
+
 		if ( wWriteDone )
 			rNextState = `STATE_DISPLAY_CONTROL;
 		else
 			rNextState = `STATE_ENTRY_MODE;
 	end
-	
-//------------------------------------------	
+
+//------------------------------------------
 
 	`STATE_DISPLAY_CONTROL:
 	begin
@@ -233,13 +232,13 @@ Wait 4.1 ms or longer, which is 205,000 clock cycles at 50 MHz.
 		oLCD_Data = 4'h0F;
 		oLCD_RegisterSelect = 1'b0; //these are commands
 		rTimeCountReset = 1'b1;
-		
+
 		if ( wWriteDone )
 			rNextState = `STATE_DISPLAY_CLEAR;
 		else
 			rNextState = `STATE_DISPLAY_CONTROL;
 	end
-	
+
 //------------------------------------------
 
 	`STATE_DISPLAY_CLEAR:
@@ -248,13 +247,13 @@ Wait 4.1 ms or longer, which is 205,000 clock cycles at 50 MHz.
 		oLCD_Data = 4'h01;
 		oLCD_RegisterSelect = 1'b0; //these are commands
 		rTimeCountReset = 1'b1;
-		
+
 		if ( wWriteDone )
 			rNextState = `STATE_DISPLAY_CLEAR;
 		else
 			rNextState = `STATE_DISPLAY_CONTROL;
 	end
-	
+
 //------------------------------------------
 
 	default:
@@ -263,14 +262,12 @@ Wait 4.1 ms or longer, which is 205,000 clock cycles at 50 MHz.
 		oLCD_Data = 4'h0;
 		oLCD_RegisterSelect = 1'b0;
 		rTimeCountReset = 1'b0;
-		
+
 		rNextState = `STATE_RESET;
 	end
-	
+
 //------------------------------------------
 	endcase
 	end
 
 endmodule
-
-
