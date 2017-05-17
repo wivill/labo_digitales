@@ -1,4 +1,4 @@
-`timescale 1ns / 1ps
+//`timescale 1ns / 1ps
 //////////////////////////////////////////////////////////////////////////////////
 // Company:
 // Engineer:
@@ -20,21 +20,23 @@
 
 `timescale 1ns / 1ps
 
-`define STATE_RESET 				 0
-`define STATE_WAIT_15 			 1
-`define STATE_TIMER_RESET1		 2
-`define STATE_POWERON_INIT_1   3
-`define STATE_POWERON_INIT_2   4
-`define STATE_WAIT_2   			 5
-`define STATE_TIMER_RESET2		 6
-`define STATE_FUNCTION_SET1 	 7
-`define STATE_FUNCTION_SET2 	 8
-`define STATE_ENTRY_MODE1  	 9
-`define STATE_ENTRY_MODE2  	 10
-`define STATE_DISPLAY_CONTROL1 11
-`define STATE_DISPLAY_CONTROL2 12
-`define STATE_DISPLAY_CLEAR1   13
-`define STATE_DISPLAY_CLEAR2   14
+`define STATE_RESET 			0
+`define STATE_WAIT_15 			1
+`define STATE_TIMER_RESET1		2
+`define STATE_POWERON_INIT_1   		3
+`define STATE_POWERON_INIT_2  		4
+`define STATE_WAIT_2   			5
+`define STATE_TIMER_RESET2		6
+`define STATE_FUNCTION_SET1 	 	7
+`define STATE_FUNCTION_SET2 	 	8
+`define STATE_ENTRY_MODE1  	 	9
+`define STATE_ENTRY_MODE2  	 	10
+`define STATE_DISPLAY_CONTROL1 		11
+`define STATE_DISPLAY_CONTROL2 		12
+`define STATE_DISPLAY_CLEAR1   		13
+`define STATE_DISPLAY_CLEAR2   		14
+`define STATE_PRE_TIMER_RESET1		15
+`define STATE_PRE_TIMER_RESET2		16
 
 
 module Module_LCD_Control
@@ -115,10 +117,10 @@ begin
 		oLCD_Data = 4'h0;
 		oLCD_RegisterSelect = 1'b0;
 		rTimeCountReset = 1'b0;
-		enable_wait_1 = 1'b0
+		enable_wait_1 = 1'b0;
 		enable_wait_2 = 1'b0;
 		rNextState = `STATE_WAIT_15;
-		oLCD_Enabled = 1'b1;
+		oLCD_Enabled = 1'b0;
 	end
 //------------------------------------------
 /*
@@ -133,17 +135,29 @@ The 15 ms interval is 750,000 clock cycles at 50 MHz.
 		oLCD_RegisterSelect = 1'b0; //these are commands
 		rTimeCountReset = 1'b0;
 		enable_wait_2 = 0;
-		oLCD_Enabled = 1'b1;
-
+		enable_wait_1 = 0;
+		oLCD_Enabled = 1'b0;
 
 		if (rTimeCount > 32'd15 ) begin
-			enable_wait_1 = 1'b1;
-			rNextState = `STATE_TIMER_RESET1;
+			rNextState = `STATE_PRE_TIMER_RESET1;
 		end else begin
 			rNextState = `STATE_WAIT_15;
-			enable_wait_1 = 1'b0;
 		end
 	end
+
+//------------------------------------------
+
+	`STATE_PRE_TIMER_RESET1:
+	begin
+		oLCD_Data = 4'h0;
+		oLCD_RegisterSelect = 1'b0; //these are commands
+		rTimeCountReset = 1'b0;
+		enable_wait_2 = 0;
+		oLCD_Enabled = 1'b0;
+		enable_wait_1 = 1'b1;
+		rNextState = `STATE_TIMER_RESET1;	
+	end
+
 //------------------------------------------
 
 	`STATE_TIMER_RESET1:
@@ -154,7 +168,7 @@ The 15 ms interval is 750,000 clock cycles at 50 MHz.
 		rTimeCountReset = 1'b1; //Reset the counter here
 		enable_wait_1 = 0;
 		enable_wait_2 = 0;
-		oLCD_Enabled = 1'b1;
+		oLCD_Enabled = 1'b0;
 
 		case(prox_wait_state)
 		1:
@@ -211,18 +225,31 @@ Wait 4.1 ms or longer, which is 205,000 clock cycles at 50 MHz.
 		oLCD_RegisterSelect = 1'b0; //these are commands
 		rTimeCountReset = 1'b0;
 		enable_wait_1 = 0;
-		oLCD_Enabled = 1'b1;
+		enable_wait_2 = 0;
+		oLCD_Enabled = 1'b0;
 
 		if (rTimeCount > 32'd2 )
 		begin
-			enable_wait_2 = 1;
-			rNextState = `STATE_TIMER_RESET2;
+			rNextState = `STATE_PRE_TIMER_RESET2;
 		end else begin
 			rNextState = `STATE_WAIT_2;
-			enable_wait_2 = 0;
 		end
 	end
 	
+
+	//------------------------------------------
+
+	`STATE_PRE_TIMER_RESET2:
+	begin
+		oLCD_Data = 4'h0;
+		oLCD_RegisterSelect = 1'b0; //these are commands
+		rTimeCountReset = 1'b0;
+		enable_wait_1 = 0;
+		enable_wait_2 = 1;
+		oLCD_Enabled = 1'b0;
+		rNextState = `STATE_TIMER_RESET2;
+	end
+
 	//------------------------------------------
 
 	`STATE_TIMER_RESET2:
@@ -233,7 +260,7 @@ Wait 4.1 ms or longer, which is 205,000 clock cycles at 50 MHz.
 		rTimeCountReset = 1'b1; //Reset the counter here
 		enable_wait_1 = 0;
 		enable_wait_2 = 0;
-		oLCD_Enabled = 1'b1;
+		oLCD_Enabled = 1'b0;
 		case(prox_wait_state2)
 		1:
 		begin
@@ -364,7 +391,7 @@ Wait 4.1 ms or longer, which is 205,000 clock cycles at 50 MHz.
 	`STATE_DISPLAY_CONTROL2:
 	begin
 		//rWrite_Enabled = 1'b1;
-		oLCD_Data = 4'b1111;
+		oLCD_Data = 4'b1110;
 		oLCD_RegisterSelect = 1'b0; //these are commands
 		rTimeCountReset = 1'b1;
 		enable_wait_1 = 0;
