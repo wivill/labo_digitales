@@ -38,7 +38,6 @@ module TestBench;
 	Module_LCD_Control uut (
 		.Clock(Clock), 
 		.Reset(Reset), 
-		.oLed(oLed),
 		.oLCD_Enabled(oLCD_Enabled),
 		.oLCD_RegisterSelect(oLCD_RegisterSelect),
 		.oLCD_StrataFlashControl(oLCD_StrataFlashControl),
