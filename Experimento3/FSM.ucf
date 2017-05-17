@@ -1,7 +1,8 @@
 
 NET "Clock" LOC = C9;
+NET "Clock" IOSTANDARD = LVCMOS33;
 NET "Reset" LOC = L13;
-NET "Reset" IOSTANDARD = LVTTL;
+NET "Reset" IOSTANDARD = LVCMOS33;
 NET "Reset" PULLDOWN;
 
 

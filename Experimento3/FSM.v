@@ -37,7 +37,10 @@
 `define STATE_DISPLAY_CLEAR2   		14
 `define STATE_PRE_TIMER_RESET1		15
 `define STATE_PRE_TIMER_RESET2		16
-
+`define STATE_POWERON_PRE_INIT_1    17
+`define STATE_POWERON_PRE_INIT_2    18
+`define STATE_WRITE_DATA1    			19
+`define STATE_WRITE_DATA2    			20
 
 module Module_LCD_Control
 (
@@ -174,7 +177,7 @@ The 15 ms interval is 750,000 clock cycles at 50 MHz.
 		case(prox_wait_state)
 		4'b0001:
 		begin
-			rNextState = `STATE_POWERON_INIT_1;
+			rNextState = `STATE_POWERON_PRE_INIT_1;
 		end
 		4'b0010:
 		begin
@@ -182,21 +185,52 @@ The 15 ms interval is 750,000 clock cycles at 50 MHz.
 		end
 		4'b0011:
 		begin
-			rNextState = `STATE_POWERON_INIT_1;
+			rNextState = `STATE_POWERON_PRE_INIT_1;
 		end
 		4'b0100:
 		begin
-			rNextState = `STATE_POWERON_INIT_2;
+			rNextState = `STATE_POWERON_INIT_1;
 		end
 		4'b0101:
+		begin
+			rNextState = `STATE_POWERON_PRE_INIT_1;
+		end
+		4'b0110:
+		begin
+			rNextState = `STATE_POWERON_INIT_1;
+		end
+		4'b0111:
+		begin
+			rNextState = `STATE_POWERON_PRE_INIT_2;
+		end
+		4'b1000:
+		begin
+			rNextState = `STATE_POWERON_INIT_2;
+		end
+		4'b1001:
 		begin
 			rNextState = `STATE_FUNCTION_SET1;
 		end
 		default:
 		begin
-			rNextState = `STATE_FUNCTION_SET1;            //FIXME
+			rNextState = `STATE_WAIT_15;            //FIXME
 		end
 		endcase
+	end
+
+//------------------------------------------
+
+	`STATE_POWERON_PRE_INIT_1:
+	begin
+		//rWrite_Enabled = 1'b1;
+		oLCD_Data = 4'h0;
+		oLCD_RegisterSelect = 1'b0; //these are commands
+		rTimeCountReset = 1'b1;
+		enable_wait_1 = 0;
+		enable_wait_2 = 0;
+		oLCD_Enabled = 1'b1;
+
+		rNextState = `STATE_WAIT_15;
 	end
 
 //------------------------------------------
@@ -291,13 +325,36 @@ Wait 4.1 ms or longer, which is 205,000 clock cycles at 50 MHz.
 		begin
 			rNextState = `STATE_DISPLAY_CLEAR2;
 		end
+		4'b1000:
+		begin
+			rNextState = `STATE_WRITE_DATA1;
+		end
+		4'b1001:
+		begin
+			rNextState = `STATE_WRITE_DATA2;
+		end
 		default:
 		begin
-			rNextState = `STATE_FUNCTION_SET1;                //FIXME
+			rNextState = `STATE_WAIT_2;                //FIXME
 		end
 		endcase
 	end
 	
+	
+//------------------------------------------
+
+	`STATE_POWERON_PRE_INIT_2:
+	begin
+		//rWrite_Enabled = 1'b1;
+		oLCD_Data = 4'h0;
+		oLCD_RegisterSelect = 1'b0; //these are commands
+		rTimeCountReset = 1'b1;
+		enable_wait_1 = 0;
+		enable_wait_2 = 0;
+		oLCD_Enabled = 1'b1;
+
+		rNextState = `STATE_WAIT_15;
+	end
 //------------------------------------------
 
 	`STATE_POWERON_INIT_2:
@@ -429,9 +486,36 @@ Wait 4.1 ms or longer, which is 205,000 clock cycles at 50 MHz.
 		enable_wait_2 = 0;
 		oLCD_Enabled = 1'b1;
 
-		rNextState = `STATE_DISPLAY_CLEAR2;
+		rNextState = `STATE_WAIT_2;
 	end
+//-----------------------------------------
+	`STATE_WRITE_DATA1:
+	begin
+		//rWrite_Enabled = 1'b1;
+		oLCD_Data = 4'b0100;
+		oLCD_RegisterSelect = 1'b1; //these are commands
+		rTimeCountReset = 1'b1;
+		enable_wait_1 = 0;
+		enable_wait_2 = 0;
+		oLCD_Enabled = 1'b1;
 
+		rNextState = `STATE_WAIT_2;
+	end
+	
+//-----------------------------------------
+	`STATE_WRITE_DATA2:
+	begin
+		//rWrite_Enabled = 1'b1;
+		oLCD_Data = 4'b0001;
+		oLCD_RegisterSelect = 1'b1; //these are commands
+		rTimeCountReset = 1'b1;
+		enable_wait_1 = 0;
+		enable_wait_2 = 0;
+		oLCD_Enabled = 1'b1;
+
+		rNextState = `STATE_WAIT_2;
+	end
+	
 //------------------------------------------
 
 	default:
