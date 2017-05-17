@@ -115,7 +115,7 @@ begin
 		oLCD_Data = 4'h0;
 		oLCD_RegisterSelect = 1'b0;
 		rTimeCountReset = 1'b0;
-		enable_wait_1 = 1'b0
+		enable_wait_1 = 1'b0;
 		enable_wait_2 = 1'b0;
 		rNextState = `STATE_WAIT_15;
 		oLCD_Enabled = 1'b1;
