@@ -387,12 +387,6 @@ begin
 		oLCD_Enabled = 			wLCD_EN;
         w8Bitsdata = alu_data;
 		wWriteBegin = 				1'b1;
-        //if(externalInput)
-        //begin
-            //w8Bitsdata = alu_data;
-        //end
-        //else
-		//  w8Bitsdata = 				8'h5a;	//'Z'
 		if ( wWriteDone )// waits signal from command sender
 		begin
 			rNextState = `WAIT_FOR_DATA;

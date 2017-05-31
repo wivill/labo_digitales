@@ -220,7 +220,7 @@ begin
 		oSender = 			4'b0;
 		oWriteDone = 		1'b0;
 		oLCD_EN = 			1'b0;
-		rTimeCountReset = 1'b0;
+		rTimeCountReset =   1'b0;
 		
 		//delay 40us
 		if (rTimeCount > 32'd2000 )
