@@ -27,26 +27,24 @@ module testbench_LCD;
 	// Inputs
 	reg Clock;
 	reg Reset;
-
-	// Outputs
-	wire oLCD_Enabled;
-	wire oLCD_RegisterSelect;
-	wire oLCD_StrataFlashControl;
-	wire oLCD_ReadWrite;
-	wire [3:0] oLCD_Data;
 	
-	// Instantiate the Unit Under Test (UUT)
-	LCD uut (
+	// Outputs
+	reg [7:0] oLed;
+	wire oLCD_Enabled;
+	wire oLCD_RegisterSelect; //0=Command, 1=Data
+	reg oLCD_StrataFlashControl;
+	reg oLCD_ReadWrite;
+	wire[3:0] oLCD_Data;
+	LCD lcd (
 		.Clock(Clock), 
 		.Reset(Reset), 
-		.oLCD_Enabled(oLCD_Enabled), 
-		.oLCD_RegisterSelect(oLCD_RegisterSelect), 
-		.oLCD_StrataFlashControl(oLCD_StrataFlashControl), 
-		.oLCD_ReadWrite(oLCD_ReadWrite), 
+		.oLCD_Enabled(oLCD_Enabled),
+		.oLCD_RegisterSelect(oLCD_RegisterSelect),
+		.oLCD_StrataFlashControl(oLCD_StrataFlashControl),
+		.oLCD_ReadWrite(oLCD_ReadWrite),
 		.oLCD_Data(oLCD_Data)
 	);
 	
-	// generates clock signal
 	always #10 Clock = !Clock;
 
 	initial begin 
@@ -55,13 +53,17 @@ module testbench_LCD;
 		Reset = 0;
 		
 		// reset module
-		#100
+		#50
 		Reset = 1;
-		#100
+		#50
 		Reset = 0;
 		
 		// Wait 22 ms 
-		#22000000
+		#22000000;
+		
+		#22000000;
+		
+		#22000000;
 		
 		$finish;
 	end

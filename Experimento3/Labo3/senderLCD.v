@@ -143,7 +143,7 @@ begin
 	//delay between 4 bit sending events
 	`STATE_INTER:
 	begin
-		oSender = 			4'b0;
+		oSender = 			iData[7:4];//4'b0;
 		oWriteDone = 		1'b0;
 		oLCD_EN = 			1'b0;
 		rTimeCountReset = 1'b0;
@@ -217,10 +217,10 @@ begin
 	//delay of 40us between commands/data
 	`STATE_FINISH_W:
 	begin
-		oSender = 			4'b0;
+		oSender = 			iData[3:0];//4'b0;
 		oWriteDone = 		1'b0;
 		oLCD_EN = 			1'b0;
-		rTimeCountReset =   1'b0;
+		rTimeCountReset = 1'b0;
 		
 		//delay 40us
 		if (rTimeCount > 32'd2000 )

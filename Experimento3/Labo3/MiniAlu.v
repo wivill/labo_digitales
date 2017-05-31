@@ -2,15 +2,15 @@
 `timescale 1ns / 1ps
 `include "Defintions.v"
 
-
 module MiniAlu
 (
  input wire Clock,
  input wire Reset,
- output wire [7:0] oLed
-
- 
+ output reg [7:0] alu_data,
+ output reg externalInput
 );
+
+
 
 wire [15:0]  wIP,wIP_temp;
 reg         rWriteEnable,rBranchTaken;
@@ -20,6 +20,11 @@ reg [15:0]   rResult;
 wire [7:0]  wSourceAddr0,wSourceAddr1,wDestination;
 wire [15:0] wSourceData0,wSourceData1,wIPInitialValue,wImmediateValue;
 
+wire init_finish;
+
+wire [7:0] oLed;
+
+//assign alu_data = wSourceData0[15:8];
 ROM InstructionRom 
 (
 	.iAddress(     wIP          ),
@@ -109,6 +114,7 @@ begin
 		rFFLedEN     <= 1'b0;
 		rBranchTaken <= 1'b0;
 		rWriteEnable <= 1'b0;
+		externalInput <= 1'b0;
 		rResult      <= 0;
 	end
 	//-------------------------------------
@@ -117,6 +123,7 @@ begin
 		rFFLedEN     <= 1'b0;
 		rBranchTaken <= 1'b0;
 		rWriteEnable <= 1'b1;
+		externalInput <= 1'b0;
 		rResult      <= wSourceData1 + wSourceData0;
 	end
 	//-------------------------------------
@@ -125,6 +132,7 @@ begin
 		rFFLedEN     <= 1'b0;
 		rWriteEnable <= 1'b1;
 		rBranchTaken <= 1'b0;
+		externalInput <= 1'b0;
 		rResult      <= wImmediateValue;
 	end
 	//-------------------------------------
@@ -133,6 +141,7 @@ begin
 		rFFLedEN     <= 1'b0;
 		rWriteEnable <= 1'b0;
 		rResult      <= 0;
+		externalInput <= 1'b0;
 		if (wSourceData1 <= wSourceData0 )
 			rBranchTaken <= 1'b1;
 		else
@@ -145,6 +154,7 @@ begin
 		rFFLedEN     <= 1'b0;
 		rWriteEnable <= 1'b0;
 		rResult      <= 0;
+		externalInput <= 1'b0;
 		rBranchTaken <= 1'b1;
 	end
 	//-------------------------------------	
@@ -153,7 +163,18 @@ begin
 		rFFLedEN     <= 1'b1;
 		rWriteEnable <= 1'b0;
 		rResult      <= 0;
+		externalInput <= 1'b0;
 		rBranchTaken <= 1'b0;
+	end
+	//-------------------------------------
+	`LCD:
+	begin
+		rFFLedEN     <= 1'b0;
+		rBranchTaken <= 1'b0;
+		rWriteEnable <= 1'b1;
+		externalInput <= 1'b1;
+		rResult      <= wSourceData0;
+		alu_data <= wSourceData0[15:8];
 	end
 	//-------------------------------------
 	default:
@@ -161,6 +182,7 @@ begin
 		rFFLedEN     <= 1'b1;
 		rWriteEnable <= 1'b0;
 		rResult      <= 0;
+		externalInput <= 1'b0;
 		rBranchTaken <= 1'b0;
 	end	
 	//-------------------------------------	

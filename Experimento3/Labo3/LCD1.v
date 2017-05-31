@@ -43,13 +43,11 @@
 module LCD(
     input wire 	Clock,
     input wire 	Reset,
-    input wire 	externalInput, //habilita a este modulo a leer los datos que envia la ALU
-    input wire 	[7:0] alu_data, //datos enviados por la alu
     output reg 	oLCD_Enabled,
     output reg 	oLCD_RegisterSelect,
     output wire 	oLCD_StrataFlashControl,
     output wire 	oLCD_ReadWrite,
-    output reg 	[3:0] oLCD_Data // datos enviados al lcd;
+    output reg 	[3:0] oLCD_Data// datos enviados al lcd;
     );
 
 assign oLCD_ReadWrite = 0; // only write mode is needed
@@ -76,6 +74,18 @@ senderLCD senderCmds(
 .oSender(oSender),
 .oLCD_EN(wLCD_EN)
 );
+
+wire [7:0] alu_data;
+wire externalInput;
+reg init_finish;
+wire alu_reset; //la idea es habilitar la ALU hasta que el proceso de inicializacion del LCD halla concluido
+assign alu_reset = !init_finish;
+	MiniAlu alu (
+		.Clock(Clock), 
+		.Reset(alu_reset),
+		.alu_data(alu_data),
+		.externalInput(externalInput)
+	);
 
 //----------------------------------------------
 //Next State and delay logic
@@ -104,6 +114,7 @@ begin
 	//------------------------------------------
 	`STATE_RESET:
 	begin
+		init_finish = 0;
 		oLCD_Data = 				4'h0;
 		oLCD_RegisterSelect = 	1'b0;
 		rTimeCountReset = 		1'b1;
@@ -116,6 +127,7 @@ begin
 	//The 15 ms interval is 750,000 clock cycles at 50 MHz.
 	`STATE_POWERON_INIT_0: 
 	begin
+		init_finish = 0;
 		oLCD_Data=					4'h0;
 		oLCD_RegisterSelect=		1'b0; 
 		rTimeCountReset=			1'b0;
@@ -135,6 +147,7 @@ begin
 	//Write SF_D<11:8> = 0x3, pulse LCD_E High for 15 clock cycles
 	`STATE_POWERON_INIT_1:
 	begin
+		init_finish = 0;
 		oLCD_Data = 				4'h3;
 		oLCD_RegisterSelect = 	1'b0; //these are commands
 		rTimeCountReset = 		1'b0;
@@ -154,6 +167,7 @@ begin
 	//The 4.1 ms interval is 205,000 clock cycles at 50 MHz.
 	`STATE_POWERON_INIT_2:
 	begin
+		init_finish = 0;
 		oLCD_Data = 				4'h0;
 		oLCD_RegisterSelect = 	1'b0; 
 		rTimeCountReset = 		1'b0;
@@ -173,6 +187,7 @@ begin
 		//4-bit write = 3 hex for 15 cycles
 	`STATE_POWERON_INIT_3:
 	begin
+		init_finish = 0;
 		oLCD_Data = 				4'h3; //0x3
 		oLCD_RegisterSelect = 	1'b0; //these are commands
 		rTimeCountReset = 		1'b0;
@@ -192,6 +207,7 @@ begin
 	//The 100 us interval is 5,000 clock cycles at 50 MHz
 	`STATE_POWERON_INIT_4:
 	begin
+		init_finish = 0;
 		oLCD_Data = 				4'h0;
 		oLCD_RegisterSelect = 	1'b0; 
 		rTimeCountReset = 		1'b0;
@@ -211,6 +227,7 @@ begin
 	//4-bit write = 3 hex for 15 cycles
 	`STATE_POWERON_INIT_5:
 	begin
+		init_finish = 0;
 		oLCD_Data = 				4'h3; //0x3
 		oLCD_RegisterSelect = 	1'b0; //these are commands
 		rTimeCountReset = 		1'b0;
@@ -230,6 +247,7 @@ begin
 	//The 40 us interval is 2,000 clock cycles at 50 MHz
 	`STATE_POWERON_INIT_6:
 	begin
+		init_finish = 0;
 		oLCD_Data = 				4'h0;
 		oLCD_RegisterSelect = 	1'b0; 
 		rTimeCountReset = 		1'b0;
@@ -249,6 +267,7 @@ begin
 	//4-bit write = 2 hex for 15 cycles
 	`STATE_POWERON_INIT_7:
 	begin
+		init_finish = 0;
 		oLCD_Data = 				4'h2; //0x2
 		oLCD_RegisterSelect = 	1'b0; //these are commands
 		rTimeCountReset = 		1'b0;
@@ -267,6 +286,7 @@ begin
 	//The 40 us interval is 2,000 clock cycles at 50 MHz
 	`STATE_POWERON_INIT_8:
 	begin
+		init_finish = 0;
 		oLCD_Data = 				4'h0;
 		oLCD_RegisterSelect = 	1'b0; 
 		rTimeCountReset = 		1'b0;
@@ -286,6 +306,7 @@ begin
 	// Issue a Function Set command, 0x28
 	`STATE_FSET:
 	begin
+		init_finish = 0;
 		oLCD_Data = 				oSender; //out of command sender
 		oLCD_RegisterSelect = 	1'b0; 	//these are commands
 		rTimeCountReset = 		1'b1;
@@ -304,6 +325,7 @@ begin
 	//Issue an Entry Mode Set command, 0x06
 	`STATE_ENTRY_MOD:
 	begin
+		init_finish = 0;
 		oLCD_Data = 				oSender; //out of command sender
 		oLCD_RegisterSelect = 	1'b0; 	//these are commands
 		rTimeCountReset = 		1'b1;
@@ -322,6 +344,7 @@ begin
 	//Issue a Display command, 0x0C
 	`STATE_DISP_CTL:
 	begin
+		init_finish = 0;
 		oLCD_Data = 				oSender; //out of command sender
 		oLCD_RegisterSelect = 	1'b0; 	//these are commands
 		rTimeCountReset = 		1'b1;
@@ -341,6 +364,7 @@ begin
 	//Issue a Clear Display command, 0x01
 	`STATE_DISP_CLEAR:
 	begin
+		init_finish = 0;
 		oLCD_Data = 				oSender; //out of command sender
 		oLCD_RegisterSelect = 	1'b0; 	//these are commands
 		rTimeCountReset = 		1'b1;
@@ -360,6 +384,7 @@ begin
 	//The 1.7 ms interval is 85,000 clock cycles at 50 MHz
 	`STATE_AFTER_CLEAR:
 	begin
+		init_finish = 1;
 		oLCD_Data = 				oSender;
 		oLCD_RegisterSelect = 	1'b0; 
 		rTimeCountReset =			1'b0;
@@ -381,6 +406,7 @@ begin
 	// write Z
 	`STATE_WRITE_CHAR:
 	begin
+		init_finish = 1;
 		oLCD_Data = 				oSender;
 		oLCD_RegisterSelect = 	1'b1; 	//this is data
 		rTimeCountReset =			1'b1;
@@ -397,6 +423,7 @@ begin
 	//------------------------------------------
 	`WAIT_FOR_DATA:
 	begin
+		init_finish = 1;
 		oLCD_Data=					4'h0;
 		oLCD_RegisterSelect=		1'b0; 
 		rTimeCountReset=			1'b0;
@@ -421,17 +448,6 @@ begin
 		w8Bitsdata = 				8'h0;		
 		rNextState = `STATE_RESET;
 	end
-
-
-
-
-
-
-
-
-
-
-
 	endcase
 end
 endmodule
