@@ -1,3 +1,5 @@
+`include "definitions.v"
+
 `timescale 1ns / 1ps
 
 // state definitions
@@ -18,6 +20,7 @@
 `define STATE_AFTER_CLEAR		14
 `define STATE_WRITE_CHAR		15
 `define STATE_RESET				16
+`define STATE_WRITE_WAIT	   17
 
 //////////////////////////////////////////////////////////////////////////////////
 // Company: 
@@ -62,6 +65,12 @@ reg [7:0] w8Bitsdata;
 wire wWriteDone;
 wire [3:0] oSender;
 wire wLCD_EN;
+
+   parameter LENGTH  = 2;
+   wire [0:(8*LENGTH-1)] Chars;
+   //assign Chars = {`H,`O,`L,`A,`SPC,`M,`U,`N,`D,`O}; 
+	assign Chars = {`M,`U}; 
+	integer i;
 
 //sends one command/data when wWriteBegin=1
 senderLCD senderCmds(
@@ -108,6 +117,7 @@ begin
 		wWriteBegin = 				1'b0;
 		w8Bitsdata = 				8'h0;
 		rNextState = 				`STATE_POWERON_INIT_0;
+		i = 0;
 	end
 	//------------------------------------------
 	//The 15 ms interval is 750,000 clock cycles at 50 MHz.
@@ -306,7 +316,7 @@ begin
 		rTimeCountReset = 		1'b1;
 		oLCD_Enabled = 			wLCD_EN;
 		wWriteBegin = 				1'b1;
-		w8Bitsdata = 				8'h06;	//command
+		w8Bitsdata = 				8'h07;	//command
 		
 		if ( wWriteDone )// waits signal from command sender
 		begin
@@ -379,12 +389,41 @@ begin
 	begin
 		oLCD_Data = 				oSender;
 		oLCD_RegisterSelect = 	1'b1; 	//this is data
-		rTimeCountReset =			1'b1;
+		rTimeCountReset =			1'b0;
 		oLCD_Enabled = 			wLCD_EN;
 		wWriteBegin = 				1'b1;
-		w8Bitsdata = 				8'h5a;	//'Z'
-
+		
+		//for(i=0; i<LENGTH; i=i+1)begin
+			w8Bitsdata = Chars[i*8 +: 8];	//'Z'
+			//w8Bitsdata = 8'h14;
+		//end
+		
+		//w8Bitsdata = 				8'h30;	//'Z'
 		if ( wWriteDone )// waits signal from command sender
+		begin
+			rNextState = `STATE_WRITE_WAIT;
+			i = i+1;
+		end
+		else
+			rNextState = `STATE_WRITE_CHAR;
+	end
+	
+	//------------------------------------------
+	// write Z
+	`STATE_WRITE_WAIT:
+	begin
+		oLCD_Data = 				oSender;
+		oLCD_RegisterSelect = 	1'b0; 	//this is data
+		rTimeCountReset =			1'b0;
+		oLCD_Enabled = 			wLCD_EN;
+		wWriteBegin = 				1'b1;
+		//for(i=0; i<LENGTH; i=i+1)begin
+			//w8Bitsdata = Chars[i*8 +: 8];	//'Z'
+			w8Bitsdata = 8'h14;
+		//end
+		
+		//w8Bitsdata = 				8'h30;	//'Z'
+		if ( i>=LENGTH)// waits signal from command sender
 		begin
 			rNextState = `STATE_RESET;
 		end
