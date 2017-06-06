@@ -1,0 +1,35 @@
+#Configuracion de pines para Laboratorio 3 LCD
+
+#Reloj
+NET "Clock" LOC = C9;
+NET "Clock" PERIOD = 20.0ns HIGH 50%;
+#NET "Clock" IOSTANDARD = LVCMOS33;
+
+#RESET
+NET "Reset" LOC = L13;
+#NET "Reset" IOSTANDARD = LVCMOS33;
+#NET "Reset" PULLDOWN;
+
+#Pines LCD
+NET "oLCD_Enabled"  LOC = "M18" | IOSTANDARD = LVCMOS33  | DRIVE = 4  | SLEW = SLOW;
+NET "oLCD_RegisterSelect" LOC = "L18" | IOSTANDARD = LVCMOS33  | DRIVE = 4  | SLEW = SLOW;
+NET "oLCD_ReadWrite" LOC = "L17" | IOSTANDARD = LVCMOS33  | DRIVE = 4  | SLEW = SLOW;
+NET "oLCD_StrataFlashControl" LOC = "D16" | IOSTANDARD = LVCMOS33 | DRIVE = 4 | SLEW = SLOW;
+
+#Pines de Datos
+# LCD data connections are shared with StrataFlash connections SF_D<11:8>
+NET "oLCD_Data<0>"  LOC = "R15" | IOSTANDARD = LVCMOS33  | DRIVE = 4  | SLEW = SLOW ;
+NET "oLCD_Data<1>"  LOC = "R16" | IOSTANDARD = LVCMOS33  | DRIVE = 4  | SLEW = SLOW ;
+NET "oLCD_Data<2>"  LOC = "P17" | IOSTANDARD = LVCMOS33  | DRIVE = 4  | SLEW = SLOW ;
+NET "oLCD_Data<3>"  LOC = "M15" | IOSTANDARD = LVCMOS33  | DRIVE = 4  | SLEW = SLOW ;
+
+#PINES de LEDS (No se usan en este laboratorio)
+#NET "leds<0>" LOC="F12" | IOSTANDARD = LVTTL | DRIVE = 8 ;
+#NET "leds<1>" LOC="E12" | IOSTANDARD = LVTTL | DRIVE = 8 ;
+#NET "leds<2>" LOC="E11" | IOSTANDARD = LVTTL | DRIVE = 8 ;
+#NET "leds<3>" LOC="F11" | IOSTANDARD = LVTTL | DRIVE = 8 ;
+#NET "leds<4>" LOC="C11" | IOSTANDARD = LVTTL | DRIVE = 8 ;
+#NET "leds<5>" LOC="D11" | IOSTANDARD = LVTTL | DRIVE = 8 ;
+#NET "leds<6>" LOC="E9"	| IOSTANDARD = LVTTL | DRIVE = 8 ;
+#NET "leds<7>" LOC="F9"	| IOSTANDARD = LVTTL | DRIVE = 8 ;
+
