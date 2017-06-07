@@ -1,0 +1,11 @@
+`timescale 1ns / 1ps
+
+module Display_VGA(
+    input wire 	Clock,
+    input wire 	Reset,
+    output reg 	oLCD_Enabled,
+    output reg 	oLCD_RegisterSelect,
+    output wire 	oLCD_StrataFlashControl,
+    output wire 	oLCD_ReadWrite,
+    output reg 	[3:0] oLCD_Data
+    );
