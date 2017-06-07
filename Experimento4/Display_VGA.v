@@ -8,7 +8,7 @@
 
 module Display_VGA # (parameter XWith = 8,
 		      parameter YWith = 8,
-		      parameter X_length = 256;
+		      parameter X_length = 256,
 		      parameter Y_length =256
 		      )
    (		   

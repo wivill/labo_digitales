@@ -1,14 +1,15 @@
 
 `timescale 1ns / 1ps
 `include "Defintions.v"
-`include "labdigitales.v"
+//`include "labdigitales.v"
 
 
 module MiniAlu
 (
  input wire Clock,
  input wire Reset,
- output wire [7:0] oLed
+ output wire [7:0] oLed,
+ output wire [4:0] oVGA
  
 );
 
@@ -20,6 +21,52 @@ reg [15:0]   rResult;
 
 wire [7:0]  wSourceAddr0, wSourceAddr1, wDestination;
 wire  [15:0] wSourceData0, wSourceData1, wIPInitialValue, wImmediateValue;
+
+//*************************Laboratorio 4: VGA************************************************************
+
+   wire      oVGA_R, oVGA_G, oVGA_B, oVGA_HS, oVGA_VS;
+   wire      wDisplayOn;
+   wire [10-1:0] wCurrentCol;
+   wire [9-1:0]  wCurrentRow;
+
+   wire [23:0] 	 wCurrentVideoReadAddr;
+   wire [23:0] 	 wVideoWriteAddr;
+   wire [2:0] 	 wWriteColor, wReadColor;
+
+   assign wCurrentVideoReadAddr = (400)*(wCurrentRow-120) + (wCurrentCol -120);
+   assign wVideoWriteAddr = (400)*wSourceData1 + wSourceData0;
+
+   RAM_SINGLE_READ_PORT # (3,19,400*240,`COLOR_BLACK) VideoMemory
+     (
+      .Clock(Clock),
+      .iWriteEnable(wOperation == `VGA),
+      .iReadAddress(wCurrentVideoReadAddr),
+      .iWriteAddress(wVideoWriteAddr),
+      .iDataIn(wWriteColor),
+      .oDataOut(wReadColor)
+      );
+
+    Display_VGA # (10,
+		      9,
+		      640,
+		      480
+		      )
+   (		   
+		   .Clock(Clock),
+		   .Reset(Reset),
+		   .oCol(wCurrentCol),
+		   .oRow(wCurrentRow),
+		   .oHSync(oVGA_HS),
+		   .oVSync(oVGA_VS),
+		   .oDisplay(wDisplayOn)
+		   );
+
+   assign {oVGA_R,oVGA_G,oVGA_B} = (wCurrentCol <= 120 || wCurrentCol <= 520 || wCurrentRow < 120 || wCurrentRow >= 360 || wDisplayOn == 0) ? {0,0,0} : wReadColor;
+
+   assign oVGA = {oVGA_R, oVGA_G, oVGA_B, oVGA_HS, oVGA_VS };
+   
+
+   
 
 //************************* Parte 1 Lboratorio cables y registros usados *********************************
 
@@ -36,8 +83,7 @@ parte 1 del laboratorio
 */
 reg signed [31:0] 	 TempMul;
 reg signed [31:0] 	 tmp;
-//wire signed [31:0]   tmp2;
-
+//wire signed [31:0]   tmp2
 /* registro donde se guarda la parte alta de la multiplicación
 a 16 bits con signo, parte 1 del laboratorio
 */
@@ -96,8 +142,7 @@ RAM_DUAL_READ_PORT DataRam
 	.iDataInMul(    rResultMul   )// conectar este registro a la RAM y asignarlo al registro no.9 de la RAM
 );
 
-
-
+   
 
 assign wIPInitialValue = (Reset) ? 8'b0 : wDestination;
 UPCOUNTER_POSEDGE IP
