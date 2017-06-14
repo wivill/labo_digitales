@@ -13,6 +13,7 @@
 `define SMUL  4'd8
 `define MUL2  4'd9
 `define MUL4bits 4'd10
+`define Display_VGA 4'd11
 
 `define R0 8'd0
 `define R1 8'd1
@@ -24,16 +25,24 @@
 `define R7 8'd7
 `define Rh 8'd8
 
-//Colores
+//VGA Colors
+ `define COLOR_BLACK 8'd0
+ `define COLOR_BLUE 8'd1 
+ `define COLOR_GREEN 8'd2
+ `define COLOR_CYAN 8'd3
+ `define COLOR_RED 8'd4
+ `define COLOR_MAGENTA 8'd5
+ `define COLOR_YELLOW 8'd6
+ `define COLOR_WHITE 8'd7
 
-`define BLACK 	3'b000
-`define BLUE 		3'b001
-`define GREEN 	3'b010
-`define CYAN 		3'b011
-`define RED 		3'b100
-`define MAGENTA 3'b101
-`define YELLOW 	3'b110
-`define WHITE 	3'b111
+ /*`define HSYNC_BP_T 16'd47
+ `define HSYNC_FP_T 16'd47
+ `define HSYNC_DISP_T 16'd384000
+ `define HSYNC_PULSE_T 16'd95
 
+ `define VSYNC_BP_T 32'd23200
+ `define VSYNC_FP_T 32'd8000
+ `define VSYNC_DISP_T 32'd384000
+ `define VSYNC_PULSE_T 32'd1600*/
 
 `endif

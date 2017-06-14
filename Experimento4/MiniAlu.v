@@ -1,7 +1,6 @@
 
 `timescale 1ns / 1ps
 `include "Defintions.v"
-//`include "labdigitales.v"
 
 
 module MiniAlu
@@ -36,21 +35,19 @@ wire  [15:0] wSourceData0, wSourceData1, wIPInitialValue, wImmediateValue;
    assign wCurrentVideoReadAddr = (400)*(wCurrentRow-120) + (wCurrentCol -120);
    assign wVideoWriteAddr = (400)*wSourceData1 + wSourceData0;
 
+   assign wWriteColor = {0,1,0};
+
    RAM_SINGLE_READ_PORT # (3,19,400*240,`COLOR_BLACK) VideoMemory
      (
       .Clock(Clock),
-      .iWriteEnable(wOperation == `VGA),
+      .iWriteEnable(wDisplayOn),
       .iReadAddress(wCurrentVideoReadAddr),
       .iWriteAddress(wVideoWriteAddr),
       .iDataIn(wWriteColor),
       .oDataOut(wReadColor)
       );
 
-    Display_VGA # (10,
-		      9,
-		      640,
-		      480
-		      )
+    Display_VGA # (10,9,640,480) display_vga
    (		   
 		   .Clock(Clock),
 		   .Reset(Reset),
@@ -70,7 +67,7 @@ wire  [15:0] wSourceData0, wSourceData1, wIPInitialValue, wImmediateValue;
 
 //************************* Parte 1 Lboratorio cables y registros usados *********************************
 
-/* cables internos conectados a las entradas y utilizados en la multiplicación de dos numeros de 16 bits con signo
+/* cables internos conectados a las entradas y utilizados en la multiplicacin de dos numeros de 16 bits con signo
 , indicado en la parte 1 del laboratorio
 */
 wire signed [15:0] wSourceData0m;
@@ -84,7 +81,7 @@ parte 1 del laboratorio
 reg signed [31:0] 	 TempMul;
 reg signed [31:0] 	 tmp;
 //wire signed [31:0]   tmp2
-/* registro donde se guarda la parte alta de la multiplicación
+/* registro donde se guarda la parte alta de la multiplicacin
 a 16 bits con signo, parte 1 del laboratorio
 */
 reg [15:0] 	 rResultMul;
@@ -108,7 +105,7 @@ wire [15:0]	 rmul8;
 
 
 
-// prueba de 4 bits // el que dice prueba es para el de 4 bits correspondiente a la parte 2 de la gúia de laboratorio
+// prueba de 4 bits // el que dice prueba es para el de 4 bits correspondiente a la parte 2 de la gia de laboratorio
 //wire  [3:0] wSourceData0Prueba,wSourceData1Prueba
 //wire signed [3:0] wSourceData0mPrueba,wSourceData1mPrueba;
 //assign wSourceData0mPrueba = wSourceData0[3:0];
@@ -373,7 +370,7 @@ begin
 		rBranchTaken <= 1'b0;
 	end
 	//-------------------------------------
-	/* Instrucción para multiplicacion de dos numeros de 16 bits
+	/* Instruccin para multiplicacion de dos numeros de 16 bits
 	modificando la RAM, parte 1 del laboratorio
 	*/
 	`SMUL:
@@ -412,6 +409,15 @@ begin
 		rResultMul   <= rResultMul4bits;
 		rBranchTaken <= 1'b0;
 	end
+
+	    //-------------------------------------
+	    `Display_VGA:
+	       begin
+		  rFFLedEN     <= 1'b0;
+		  rBranchTaken <= 1'b0;
+		  rWriteEnable <= 1'b0;
+		  rResult      <= 1'b0;
+	       end
 	//-------------------------------------
 	default:
 	begin

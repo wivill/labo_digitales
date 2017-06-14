@@ -6,8 +6,8 @@
 `define STATE_DISPLAY 3
 `define STATE_FRONT 4
 
-module Display_VGA # (parameter XWith = 8,
-		      parameter YWith = 8,
+module Display_VGA # (parameter XWidth = 8,
+		      parameter YWidth = 8,
 		      parameter X_length = 256,
 		      parameter Y_length =256
 		      )
@@ -24,7 +24,7 @@ module Display_VGA # (parameter XWith = 8,
    reg [3:0] 				  rCurrentState,rNextState;
    reg [16:0] 				  rTimeCount;
    reg 					  rTimeCountReset,VFinish;
-   reg [XWidth-1:0] 			  rNextcol;
+   reg [XWidth-1:0] 			  rNextCol;
    reg [YWidth-1:0] 			  rNextRow;
    
 
@@ -37,7 +37,7 @@ module Display_VGA # (parameter XWith = 8,
 	  end
 	else
 	  begin
-	     rCurrentState <= rNextState
+	     rCurrentState <= rNextState;
 	       if (rTimeCountReset)
 		 begin
 		    rTimeCount <= 16'b0; // resets count
@@ -58,9 +58,9 @@ module Display_VGA # (parameter XWith = 8,
 	  
 	  `STATE_RESET:
 	    begin
-	       rNextCol = 				XWidth'h0;
-	       rNextRow = 				YWidth'h0;
-	       rTimeCountReseT =                        1'b1;
+	       rNextCol = 				10'h0;
+	       rNextRow = 				9'h0;
+	       rTimeCountReset =                        1'b1;
 	       oHSync =                                 1'b1;
 	       oVSync =                                 1'b1;
 	       oDisplay =                               1'b0;
@@ -73,7 +73,7 @@ module Display_VGA # (parameter XWith = 8,
 	  
 	  `STATE_PULSE:
 	    begin
-	       rNextCol =                            	XWidth'h0; 
+	       rNextCol =                            	10'h0; 
 	       rNextRow = 				oRow;
 	       oDisplay =                               1'b0;
 
@@ -91,12 +91,12 @@ module Display_VGA # (parameter XWith = 8,
 	       
 	       if(rTimeCount < 16'd95)
 		 begin
-		    rTimeCountReseT =                   1'b0;
+		    rTimeCountReset =                   1'b0;
 		    rNextState = 		       	`STATE_PULSE;
 		 end
 	       else
 		 begin
-		    rTimeCountReseT =                     1'b1;
+		    rTimeCountReset =                     1'b1;
 		    VFinish =                             1'b0;
 		    rNextState = 			  `STATE_BACK;
 		 end
@@ -106,7 +106,7 @@ module Display_VGA # (parameter XWith = 8,
 
 	  `STATE_BACK:
 	    begin
-	       rNextCol =                            	XWidth'h0; 
+	       rNextCol =                            	10'h0; 
 	       rNextRow = 				oRow;
 	       oHSync =                                 1'b1;
 	       oVSync =                                 1'b1;
@@ -115,13 +115,13 @@ module Display_VGA # (parameter XWith = 8,
 
 	       if(rTimeCount < 16'd47)
 		 begin
-		    rTimeCountReseT =                        1'b0;
+		    rTimeCountReset =                        1'b0;
 		    rNextState = 				`STATE_BACK;
 		 end
 	       else
 		 begin
-		    rTimeCountReseT =                        1'b1;
-		    rNextState = 				`STATE_Display;
+		    rTimeCountReset =                        1'b1;
+		    rNextState = 				`STATE_DISPLAY;
 		 end
 	    end // case: `STATE_BACK
 
@@ -129,13 +129,13 @@ module Display_VGA # (parameter XWith = 8,
 
 	  `STATE_DISPLAY:
 	    begin
-	       rNextCol =                            	oCol + XWith'd1; 
+	       rNextCol =                            	oCol + 10'd1; 
 	       oHSync =                                 1'b1;
 	       oVSync =                                 1'b1;
 	       oDisplay =                               1'b1;
 	       rTimeCountReset =                        1'b0;
 
-	       if(TimeCount < X_length)
+	       if(rTimeCount < X_length)
 		 begin
 		    rNextRow = oRow;
 		    VFinish = 1'b0;
@@ -145,15 +145,15 @@ module Display_VGA # (parameter XWith = 8,
 		 begin
 		    if(oRow < Y_length)
 		      begin
-			 rNextRow = oRow + With'd1;
+			 rNextRow = oRow + 9'd1;
 			 VFinish = 1'b0;
 		      end
 		    else
 		      begin
-			 rNextRow = With'd0;
+			 rNextRow = 9'd0;
 			 VFinish = 1'b1;
 		      end
-		    rNextCol = With'd0;
+		    rNextCol = 10'd0;
 		    rTimeCountReset = 1'b1;
 		    rNextState = `STATE_FRONT;
 		 end // else: !if(TimeCount < X_length)
@@ -163,7 +163,7 @@ module Display_VGA # (parameter XWith = 8,
 
 	  `STATE_FRONT:
 	    begin
-	       rNextCol =                            	XWidth'h0; 
+	       rNextCol =                            	10'h0; 
 	       rNextRow = 				oRow;
 	       oHSync =                                 1'b1;
 	       oVSync =                                 1'b1;
@@ -172,7 +172,7 @@ module Display_VGA # (parameter XWith = 8,
 
 	       if(rTimeCount < 16'd16)
 		 begin
-		    rTimeCountReseT =                        1'b0;
+		    rTimeCountReset =                        1'b0;
 		    rNextState = 			     `STATE_FRONT;
 		 end
 	       else
@@ -186,8 +186,8 @@ module Display_VGA # (parameter XWith = 8,
 
 	  default:
 	    begin
-	       rNextCol =                            	XWidth'h0; 
-	       rNextRow = 				YWidth'h0;
+	       rNextCol =                            	10'h0; 
+	       rNextRow = 				9'h0;
 	       oHSync =                                 1'b1;
 	       oVSync =                                 1'b1;
 	       oDisplay =                               1'b0;
@@ -195,5 +195,6 @@ module Display_VGA # (parameter XWith = 8,
 	       rTimeCountReset =                        1'b0;
 	       rNextState =                             `STATE_RESET;
 	    end // case: default
-	  
-	  
+	  endcase
+	 end
+endmodule
