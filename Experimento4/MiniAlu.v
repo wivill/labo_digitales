@@ -35,30 +35,36 @@ wire  [15:0] wSourceData0, wSourceData1, wIPInitialValue, wImmediateValue;
    assign wCurrentVideoReadAddr = (400)*(wCurrentRow-120) + (wCurrentCol -120);
    assign wVideoWriteAddr = (400)*wSourceData1 + wSourceData0;
 
-   assign wWriteColor = {0,1,0};
 
    RAM_SINGLE_READ_PORT # (3,19,400*240,`COLOR_BLACK) VideoMemory
      (
       .Clock(Clock),
-      .iWriteEnable(wDisplayOn),
+      .iWriteEnable(1),
       .iReadAddress(wCurrentVideoReadAddr),
       .iWriteAddress(wVideoWriteAddr),
-      .iDataIn(wWriteColor),
+      .iDataIn(wInstruction[23:21]),
       .oDataOut(wReadColor)
-      );
+      ); 
 
-    Display_VGA # (10,9,640,480) display_vga
+    Display_VGA display_vga
    (		   
 		   .Clock(Clock),
 		   .Reset(Reset),
-		   .oCol(wCurrentCol),
-		   .oRow(wCurrentRow),
-		   .oHSync(oVGA_HS),
-		   .oVSync(oVGA_VS),
-		   .oDisplay(wDisplayOn)
+		   .iCrvgaR(WReadColor[2]),
+		   .iCrvgaG(WReadColor[1]),
+		   .iCrvgaB(WReadColor[0]),
+		   .oCrvgaR(wWriteColor[2]),
+		   .oCrvgaG(wWriteColor[1]),
+		   .oCrvgaB(wWriteColor[0]),
+		   .oCurrentCol(wCurrentCol),
+		   .oCurrentRow(wCurrentRow),
+		   .hoz_sync(oVGA_HS),
+		   .ver_sync(oVGA_VS)
 		   );
 
-   assign {oVGA_R,oVGA_G,oVGA_B} = (wCurrentCol <= 120 || wCurrentCol <= 520 || wCurrentRow < 120 || wCurrentRow >= 360 || wDisplayOn == 0) ? {0,0,0} : wReadColor;
+ //  assign {oVGA_R,oVGA_G,oVGA_B} = (wCurrentCol <= 120 || wCurrentCol <= 520 || wCurrentRow < 120 || wCurrentRow >= 360 || wDisplayOn == 0) ? {0,0,0} : wReadColor;
+
+   assign {oVGA_R, oVGA_G, oVGA_B} = wWritwColor;
 
    assign oVGA = {oVGA_R, oVGA_G, oVGA_B, oVGA_HS, oVGA_VS };
    

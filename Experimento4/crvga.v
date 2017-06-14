@@ -1,6 +1,24 @@
 `timescale 1ns / 1ps
-
-module Display_VGA(
+//////////////////////////////////////////////////////////////////////////////////
+// Company: 
+// Engineer: 
+// 
+// Create Date:    08:18:44 09/28/2016 
+// Design Name: 
+// Module Name:    crvga 
+// Project Name: 
+// Target Devices: 
+// Tool versions: 
+// Description:  
+//
+// Dependencies: 
+//
+// Revision: 
+// Revision 0.01 - File Created
+// Additional Comments: 
+//
+//////////////////////////////////////////////////////////////////////////////////
+module crvga(
 	input wire clock,
 	input wire reset,
 	input wire iCrvgaR,iCrvgaG,iCrvgaB,
@@ -76,14 +94,14 @@ module Display_VGA(
 				//set color
 				oCrvgaR 	<= 	iCrvgaR;
 				oCrvgaG 	<= 	iCrvgaG;
-				oCrvgaB 	<=	iCrvgaB;
+				oCrvgaB 	<=		iCrvgaB;
 				end
 			else
 				begin
 				//no color
 				oCrvgaR 	<= 	1'b0;
 				oCrvgaG 	<= 	1'b0;
-				oCrvgaB 	<=	1'b0;
+				oCrvgaB 	<=		1'b0;
 				end
 			
 			//horizonal sync low pulse

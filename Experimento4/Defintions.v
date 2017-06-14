@@ -26,14 +26,14 @@
 `define Rh 8'd8
 
 //VGA Colors
- `define COLOR_BLACK 8'd0
- `define COLOR_BLUE 8'd1 
- `define COLOR_GREEN 8'd2
- `define COLOR_CYAN 8'd3
- `define COLOR_RED 8'd4
- `define COLOR_MAGENTA 8'd5
- `define COLOR_YELLOW 8'd6
- `define COLOR_WHITE 8'd7
+ `define COLOR_BLACK 3'd0
+ `define COLOR_BLUE 3'd1 
+ `define COLOR_GREEN 3'd2
+ `define COLOR_CYAN 3'd3
+ `define COLOR_RED 3'd4
+ `define COLOR_MAGENTA 3'd5
+ `define COLOR_YELLOW 3'd6
+ `define COLOR_WHITE 3'd7
 
  /*`define HSYNC_BP_T 16'd47
  `define HSYNC_FP_T 16'd47
