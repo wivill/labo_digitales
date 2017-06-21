@@ -1,15 +1,17 @@
 
 `timescale 1ns / 1ps
-`include "Defintions.v"
+`include "Definitions.v"
 
 
 module MiniAlu
 (
  input wire Clock,
  input wire Reset,
+ input wire PS2_Clock,
+ input wire PS2_Data,
  output wire [7:0] oLed,
  output wire [4:0] oVGA
- 
+
 );
 
 wire [15:0]  wIP,wIP_temp;
@@ -44,10 +46,10 @@ wire  [15:0] wSourceData0, wSourceData1, wIPInitialValue, wImmediateValue;
       .iWriteAddress(wVideoWriteAddr),
       .iDataIn(wInstruction[23:21]),
       .oDataOut(wReadColor)
-      ); 
+      );
 
     Display_VGA display_vga
-   (		   
+   (
 		   .Clock(Clock),
 		   .Reset(Reset),
 		   .iCrvgaR(WReadColor[2]),
@@ -67,9 +69,9 @@ wire  [15:0] wSourceData0, wSourceData1, wIPInitialValue, wImmediateValue;
    assign {oVGA_R, oVGA_G, oVGA_B} = wWritwColor;
 
    assign oVGA = {oVGA_R, oVGA_G, oVGA_B, oVGA_HS, oVGA_VS };
-   
 
-   
+
+
 
 //************************* Parte 1 Lboratorio cables y registros usados *********************************
 
@@ -77,10 +79,10 @@ wire  [15:0] wSourceData0, wSourceData1, wIPInitialValue, wImmediateValue;
 , indicado en la parte 1 del laboratorio
 */
 wire signed [15:0] wSourceData0m;
-wire signed [15:0] wSourceData1m; 
+wire signed [15:0] wSourceData1m;
 
 /*
-registro de 32 bits, temporal que almacena el 
+registro de 32 bits, temporal que almacena el
 resultado de la multiplicacion de dos numeros de 16 bits con signo
 parte 1 del laboratorio
 */
@@ -106,7 +108,7 @@ wire [15:0]	 rmul4;
 wire [15:0]	 rmul5;
 wire [15:0]	 rmul6;
 wire [15:0]	 rmul7;
-wire [15:0]	 rmul8;	
+wire [15:0]	 rmul8;
 
 
 
@@ -117,15 +119,15 @@ wire [15:0]	 rmul8;
 //assign wSourceData0mPrueba = wSourceData0[3:0];
 //assign wSourceData1mPrueba = wSourceData1[3:0];
 wire [15:0] 	 rResultMul4bits;
- 
+
 mul4bits multiplicador4bits
 (
 	.A(wSourceData0m   ),//wSourceData1m),//4'd5  ),//wSourceData0), //4'd5  ),   //  wSourceData1mPrueba	),
 	.B(wSourceData1m  ),//wSourceData1m),//4'd2  ), // wSourceData1), //4'd4  ), //wSourceData0mPrueba),
 	.wResult( rResultMul4bits )
-); 
+);
 
-ROM InstructionRom 
+ROM InstructionRom
 (
 	.iAddress(     wIP          ),
 	.oInstruction( wInstruction )
@@ -145,12 +147,12 @@ RAM_DUAL_READ_PORT DataRam
 	.iDataInMul(    rResultMul   )// conectar este registro a la RAM y asignarlo al registro no.9 de la RAM
 );
 
-   
+
 
 assign wIPInitialValue = (Reset) ? 8'b0 : wDestination;
 UPCOUNTER_POSEDGE IP
 (
-.Clock(   Clock                ), 
+.Clock(   Clock                ),
 .Reset(   Reset | rBranchTaken ),
 .Initial( wIPInitialValue + 1  ),
 .Enable(  1'b1                 ),
@@ -158,7 +160,7 @@ UPCOUNTER_POSEDGE IP
 );
 assign wIP = (rBranchTaken) ? wIPInitialValue : wIP_temp;
 
-FFD_POSEDGE_SYNCRONOUS_RESET # ( 8 ) FFD1 
+FFD_POSEDGE_SYNCRONOUS_RESET # ( 8 ) FFD1
 (
 	.Clock(Clock),
 	.Reset(Reset),
@@ -312,6 +314,22 @@ wire [31:0] final2 = prueba3 + prueba4;
 wire [31:0] final3 = prueba5 + prueba6;
 wire [31:0] final4 = prueba7 + prueba8;
 
+
+//---------------------------
+//-------- Teclado ----------
+//---------------------------
+
+wire [7:0] mov2;
+keyboard keyboard_ctl(
+  .iClock(PS2_Clock),
+  .iData(PS2_Data),
+  .iReset(Reset),
+  .oLed(oLed),
+  .cmd_mov(mov2)
+);
+
+//===========================
+
 always @ ( * )
 begin
 	case (wOperation)
@@ -357,9 +375,9 @@ begin
 			rBranchTaken <= 1'b1;
 		else
 			rBranchTaken <= 1'b0;
-		
+
 	end
-	//-------------------------------------	
+	//-------------------------------------
 	`JMP:
 	begin
 		rFFLedEN     <= 1'b0;
@@ -367,7 +385,7 @@ begin
 		rResult      <= 0;
 		rBranchTaken <= 1'b1;
 	end
-	//-------------------------------------	
+	//-------------------------------------
 	`LED:
 	begin
 		rFFLedEN     <= 1'b1;
@@ -391,7 +409,7 @@ begin
 		rResultMul   <= TempMul[31:16];
 		rBranchTaken <= 1'b0;
 	end
-	
+
 	//-------------------------------------
 	`MUL2:
 	begin
@@ -411,7 +429,7 @@ begin
 		rFFLedEN     <= 1'b1;
 		rWriteEnable <= 1'b1;
 		rMulEnable   <= 1'b1;
-		
+
 		rResultMul   <= rResultMul4bits;
 		rBranchTaken <= 1'b0;
 	end
@@ -431,9 +449,9 @@ begin
 		rWriteEnable <= 1'b0;
 		rResult      <= 0;
 		rBranchTaken <= 1'b0;
-	end	
-	//-------------------------------------	
-	endcase	
+	end
+	//-------------------------------------
+	endcase
 end
 
 
