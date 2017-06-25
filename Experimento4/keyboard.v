@@ -1,154 +1,138 @@
 `timescale 1ns / 1ps
-
-//////////////////////////////////////////////////////////////////////////////////
-// Company:
-// Engineer:
-//
-// Create Date:    09:29:26 10/12/2016
-// Design Name:
-// Module Name:    keyboard
-// Project Name:
-// Target Devices:
-// Tool versions:
-// Description:
-//
-// Dependencies:
-//
-// Revision:
-// Revision 0.01 - File Created
-// Additional Comments:
-//
-//////////////////////////////////////////////////////////////////////////////////
-
-`define ST_check 				0
-`define ST_do 					1
-`define ST_error 				2
-`define ST_check_par 		3
-`define ST_doa					4
-module keyboard(
-	input wire iClock,
-	input wire iData,
-	input wire iReset,
-	output wire [7:0] oLed,
-	output reg [7:0] cmd_mov
+`include "Definitions.v"
+//----------------------------------------------------------------------
+// Módulo keyboard para controlar el PS/2
+module keyboard
+(
+	input wire Reset,
+	input wire PS2_CLK,
+	input wire PS2_DATA,
+	output reg [7:0] XRedCounter,
+	output reg [7:0] YRedCounter,
+	output reg [2:0] ColorReg
 );
-	reg [8:0] oCode;
-	reg [8:0] rTempCode;
-	reg [3:0] index;
-	reg reset_index;
-	reg [7:0] rCurrentState,rNextState;
-	reg parity_error;
-	reg rResetCmdMov;
-	assign oLed={5'b0,cmd_mov};
+//------------------------------------------------------------------------
+//------------------------------------------------------------------------
+reg [7:0] ScanCode;
+reg [8:0] rDataBuffer;
+reg Done, Read;
+reg [3:0] ClockCounter;
+reg rFlagF0, rFlagNoError;
+//------------------------------------------------------------------------
+//------------------------------------------------------------------------
+always @ (negedge PS2_CLK or posedge Reset) begin
+	if (Reset) begin
 
-	always @ ( negedge iClock)
-		begin
-		if(iReset)
-			begin
-			rCurrentState = `ST_check;
-			index = 4'b0;
-			end
-		else
-			begin
-			if (reset_index)
-						index = 4'b0; //restart count
-				else
-						index = index + 4'b1; //increments count
-
-			rCurrentState = rNextState;
-			end
-
-		case (rCurrentState)
-		//-----------------------------------------
-		// reset/check state
-		`ST_check:
-		begin
-			reset_index=1;
-
-			if(iData == 0)
-				begin
-				rNextState = `ST_do;
-				end
-			else
-				begin
-				rNextState = `ST_check;
-				end
+		ClockCounter <= 0;
+		Read <= 1;
+		Done <= 0;
 		end
 
+	else begin
+		if (Read == 1'b1 && PS2_DATA == 1'b0) begin
 
-		//------------------------------------------
-		// fill oCode with the 11 bits
-		`ST_do:
-			begin
-			reset_index=0;
-			if (index == 9 )
-				begin
-				if (iData == 1)
-					begin
-					if(parity_error==1'b1)
-						rNextState = `ST_check;
-					else
-						begin
-						// ignores termination codes
-						if(rResetCmdMov==1'b1)
-							begin
-							rResetCmdMov=1'b0;
-							oCode = 9'b0;
-							end
-						else
-							begin
-							if(rTempCode[7:0]==8'hF0)
-								begin
-								rResetCmdMov = 1'b1; // reset flag FF cmd_mov
-								end
-							else
-								oCode = rTempCode;
-							end
+			Read <= 0;
+			Done <= 0;
+			end
 
-						rNextState = `ST_check;
-						end
+		else if (Read == 1'b0) begin
+			if (ClockCounter < 9) begin
 
-					end
+				ClockCounter <= ClockCounter + 1;
+				rDataBuffer <= {PS2_DATA, rDataBuffer[8:1]};
+				Done <= 0;
+				end
+
+			else begin
+
+				ClockCounter <= 1'b0;
+				Done <= 1;
+				ScanCode <= rDataBuffer[7:0];
+				Read <= 1;
+
+				if (^ScanCode == rDataBuffer[8])
+
+					rFlagNoError <= 1'b0;
+
 				else
-					begin
-					rNextState = `ST_check;
-					end
+
+					rFlagNoError <= 1'b1;
+
 				end
-			else
-				begin
-				rTempCode[index]=iData;
-				rNextState = `ST_do;
-				end
-			end
 
-		//------------------------------------------
-		default:
-			begin
-			rNextState = 			`ST_check;
-			end
-
-		endcase
-	end // always *
-
-	// checks parity
-	always @(*) begin
-	if (^rTempCode[7:0] == rTempCode[8])
-		begin
-		parity_error = 1'b1; // parity error detected
-		end
-	else
-		begin
-		parity_error = 1'b0;
 		end
 	end
+end
+//------------------------------------------------------------------------
+//------------------------------------------------------------------------
+always @ (posedge Done or posedge Reset) begin
+	if (Reset) begin
 
-
-	always @(*)
-		begin
-
-		cmd_mov=oCode[7:0];
-
+		XRedCounter <= 8'b0;
+		YRedCounter <= 8'b0;
+		rFlagF0 <= 1'b0;
+		ColorReg <= 3'b1;
 		end
 
-	// FF cmd_mov
-endmodule //keyboard
+	else begin
+		if (rFlagF0) begin
+
+			rFlagF0 <= 1'b0;
+
+		end
+		else
+		//------------------------------------------------------------------------
+		case (ScanCode)
+			`W: begin
+				YRedCounter <= YRedCounter - 8'd32;
+				XRedCounter <= XRedCounter;
+				rFlagF0 <= rFlagF0;
+				ColorReg <= ColorReg;
+			end
+//------------------------------------------------------------------------
+			`S: begin
+				YRedCounter <= YRedCounter + 8'd32;
+				XRedCounter <= XRedCounter;
+				rFlagF0 <= rFlagF0;
+				ColorReg <= ColorReg;
+			end
+//------------------------------------------------------------------------
+			`A: begin
+				YRedCounter <= YRedCounter;
+				XRedCounter <= XRedCounter - 8'd32;
+				rFlagF0 <= rFlagF0;
+				ColorReg <= ColorReg;
+			end
+//------------------------------------------------------------------------
+			`D: begin
+				YRedCounter <= YRedCounter;
+				XRedCounter <= XRedCounter + 8'd32;
+				rFlagF0 <= rFlagF0;
+				ColorReg <= ColorReg;
+			end
+//------------------------------------------------------------------------
+			8'hF0: begin	//Señal de finalizacion del PS2
+				YRedCounter <= YRedCounter;
+				XRedCounter <= XRedCounter;
+				rFlagF0 <= 1'b1;
+				ColorReg <= ColorReg;
+			end
+//------------------------------------------------------------------------
+			8'h29: begin	//29 = Barra Espaciadora
+				ColorReg <= ColorReg + 3'b1;
+				YRedCounter <= YRedCounter;
+				XRedCounter <= XRedCounter;
+				rFlagF0 <= rFlagF0;
+			end
+
+			default: begin
+				YRedCounter <= YRedCounter;
+				XRedCounter <= XRedCounter;
+				rFlagF0 <= rFlagF0;
+				ColorReg <= ColorReg;
+			end
+		endcase
+	end
+end
+
+endmodule
