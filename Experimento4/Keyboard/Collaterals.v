@@ -1,7 +1,7 @@
 `timescale 1ns / 1ps
 `include "Definitions.v"
 //------------------------------------------------
-// Permite llevar el orden de ejecución de instrucciones
+// Permite llevar el orden de ejecucin de instrucciones
 module UPCOUNTER_POSEDGE # (parameter SIZE=16)
 (
 input wire Clock, Reset,
@@ -119,8 +119,8 @@ endmodule
 
 //----------------------------------------------------------------------
 //----------------------------------------------------------------------
-// Módulo keyboard para controlar el PS/2
-module keyboard
+// Mdulo keyboard para controlar el PS/2
+/*module keyboard
 (
 	input wire Reset,
 	input wire PS2_CLK,
@@ -229,7 +229,7 @@ always @ (posedge Done or posedge Reset) begin
 				ColorReg <= ColorReg;
 			end
 //------------------------------------------------------------------------
-			8'hF0: begin	//Señal de finalizacion del PS2
+			8'hF0: begin	//Seal de finalizacion del PS2
 				YRedCounter <= YRedCounter;
 				XRedCounter <= XRedCounter;
 				rFlagF0 <= 1'b1;
@@ -253,9 +253,9 @@ always @ (posedge Done or posedge Reset) begin
 	end
 end
 
-endmodule
+endmodule*/
 
-module VGA_controller
+/*module VGA_controller
 (
 	input wire				slow_clock,
 	input wire 				Reset,
@@ -313,4 +313,4 @@ UPCOUNTER_POSEDGE # (10) VERTICAL_COUNTER
 	.Q			( oVcounter      )
 );
 
-endmodule
+endmodule*/

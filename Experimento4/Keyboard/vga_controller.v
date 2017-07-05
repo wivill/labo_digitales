@@ -1,7 +1,7 @@
 `timescale 1ns / 1ps
 
 `include "Definitions.v"
-`include "Collaterals.v"
+//`include "Collaterals.v"
 
 module VGA_controller
 (
